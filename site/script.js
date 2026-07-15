@@ -43,6 +43,21 @@
     revealEls.forEach((el) => el.classList.add('in-view'));
   }
 
+  // --- Manifesto: one narrative sequence on first entry ---
+  const manifesto = document.querySelector('[data-manifesto]');
+  if (manifesto && !prefersReducedMotion && 'IntersectionObserver' in window) {
+    manifesto.classList.add('manifesto-motion-ready');
+    const manifestoObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-active');
+          manifestoObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.28, rootMargin: '0px 0px -50px 0px' });
+    manifestoObserver.observe(manifesto);
+  }
+
   // --- Esigenze system: one controlled activation when it enters the viewport ---
   const esigenzeSystem = document.querySelector('[data-es-system]');
   if (esigenzeSystem && !prefersReducedMotion && 'IntersectionObserver' in window) {
