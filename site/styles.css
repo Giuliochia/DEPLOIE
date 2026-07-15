@@ -79,8 +79,8 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
   height: 84px; display: flex; align-items: center; justify-content: space-between;
 }
 .logo { height: 42px; width: auto; }
-.nav-desktop { display: flex; align-items: center; gap: 40px; }
-.nav-desktop a:not(.btn) { font-size: 14px; font-weight: 500; }
+.nav-desktop { display: flex; align-items: center; gap: clamp(12px, 1.8vw, 28px); }
+.nav-desktop a:not(.btn) { font-size: 12px; font-weight: 500; }
 .nav-desktop a:not(.btn):hover { color: var(--gold-dark); }
 
 .menu-toggle {
@@ -172,6 +172,12 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
 .tipologie-inner { display: grid; grid-template-columns: .7fr 1.3fr; gap: 56px; }
 .tipologie-head h2 { font-size: clamp(26px, 2.6vw, 34px); font-weight: 600; letter-spacing: -.02em; line-height: 1.18; margin-bottom: 18px; }
 .tipologie-note { font-size: 15px; line-height: 1.6; color: var(--muted); }
+.section-intro { max-width: 760px; color: var(--body-text); }
+.section-intro p { font-size: 16px; line-height: 1.7; }
+.semplificare-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 56px; }
+.semplificare-card { padding-top: 24px; border-top: 1px solid var(--ink); }
+.semplificare-card h3 { min-height: 52px; font-size: 19px; line-height: 1.35; }
+.semplificare-card p { font-size: 15px; line-height: 1.65; color: var(--body-text); }
 .tipologie-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 56px; }
 .col-label {
   font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: .12em;
@@ -192,6 +198,12 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
   font-size: clamp(26px, 3.2vw, 40px); font-weight: 500; line-height: 1.26;
   letter-spacing: -.015em; max-width: 960px; text-wrap: balance;
 }
+.approccio-copy { max-width: 850px; }
+.approccio-copy h2 { margin-bottom: 28px; font-size: clamp(28px, 3.2vw, 40px); line-height: 1.2; }
+.approccio-copy p { max-width: 720px; font-size: 17px; line-height: 1.7; color: var(--line-strong); }
+
+#come-lavoriamo .metodo-head { display: block; }
+#come-lavoriamo .metodo-head h2 { max-width: 680px; }
 
 /* ===== Personale ===== */
 .personale { padding: 100px 0; }
@@ -206,6 +218,7 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
 .ritratto-slot span { font-family: ui-monospace, monospace; font-size: 11px; color: var(--muted); }
 .personale-copy h2 { font-size: clamp(26px, 3vw, 34px); font-weight: 600; letter-spacing: -.02em; line-height: 1.18; max-width: 600px; margin-bottom: 22px; }
 .personale-copy p:not(.eyebrow) { font-size: 17px; line-height: 1.66; color: var(--ink-soft); max-width: 600px; }
+.personale-copy .personale-signature { margin-top: 28px; font-weight: 600; color: var(--ink); }
 
 /* ===== Progetti ===== */
 .progetti { padding: 100px 0; background: var(--paper); }
@@ -234,16 +247,27 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
 .cta-finale-inner { display: grid; grid-template-columns: 1fr .85fr; gap: 56px; align-items: start; }
 .cta-finale h2 { font-size: clamp(30px, 3.6vw, 42px); font-weight: 600; letter-spacing: -.02em; line-height: 1.08; margin-bottom: 20px; }
 .cta-finale p { font-size: 17px; line-height: 1.6; color: var(--body-text); max-width: 480px; }
-.cta-form { display: flex; flex-direction: column; gap: 14px; }
-.cta-form textarea {
+.cta-form { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.form-field { display: flex; flex-direction: column; gap: 7px; }
+.form-field-wide { grid-column: 1 / -1; }
+.form-field label { font-size: 13px; font-weight: 600; }
+.form-field label span { color: var(--muted); font-weight: 400; }
+.cta-form input, .cta-form textarea {
   font-family: inherit; font-size: 15px; padding: 16px; border: 1.5px solid var(--line-strong);
-  border-radius: 4px; resize: vertical; min-height: 96px; color: var(--ink);
+  border-radius: 4px; color: var(--ink); background: var(--white);
   transition: border-color .18s var(--ease);
 }
-.cta-form textarea:hover { border-color: var(--muted); }
-.cta-form textarea:focus-visible { border-color: var(--ink); outline: none; }
-.cta-form .btn { align-self: flex-start; }
+.cta-form textarea { resize: vertical; min-height: 140px; }
+.cta-form input:hover, .cta-form textarea:hover { border-color: var(--muted); }
+.cta-form input:focus-visible, .cta-form textarea:focus-visible { border-color: var(--ink); outline: 2px solid var(--gold-dark); outline-offset: 2px; }
+.checkbox-field { display: flex; align-items: flex-start; gap: 10px; }
+.checkbox-field input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--gold-dark); }
+.checkbox-field label { font-size: 13px; line-height: 1.5; }
+.cta-form .btn { justify-self: start; }
 .form-status { font-size: 14px; color: var(--gold-dark); min-height: 20px; }
+.form-confirmation { align-self: center; padding: 32px; background: var(--paper); border-left: 4px solid var(--gold); }
+.form-confirmation h3 { margin-bottom: 16px; font-size: 24px; }
+.form-confirmation p { font-size: 15px; }
 
 /* ===== Footer ===== */
 .site-footer { padding: 40px 0; border-top: 1px solid var(--line); }
@@ -255,6 +279,7 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
   color: var(--body-text);
 }
 .footer-copy { color: #a8a293; }
+.footer-details { width: 100%; display: flex; gap: 14px 28px; flex-wrap: wrap; padding-top: 24px; border-top: 1px solid var(--line); font-family: ui-monospace, monospace; font-size: 11px; color: var(--muted); }
 
 /* ===== To top ===== */
 .to-top {
@@ -272,7 +297,7 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
 .reveal.in-view { opacity: 1; transform: translateY(0); }
 
 /* ===== Responsive ===== */
-@media (max-width: 980px) {
+@media (max-width: 1100px) {
   .nav-desktop { display: none; }
   .menu-toggle { display: flex; }
   .hero-inner { grid-template-columns: 1fr; }
@@ -280,6 +305,8 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
   .metodo-head, .tipologie-inner, .personale-inner { grid-template-columns: 1fr; gap: 32px; }
   .metodo-steps { grid-template-columns: 1fr 1fr; }
   .tipologie-cols { grid-template-columns: 1fr; gap: 32px; }
+  .semplificare-grid { grid-template-columns: 1fr; gap: 28px; }
+  .semplificare-card h3 { min-height: 0; }
   .case-card { grid-template-columns: 1fr; }
   .case-visual { min-height: 200px; }
   .cta-finale-inner { grid-template-columns: 1fr; }
@@ -297,6 +324,9 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
   .principio { padding: 72px 0; }
   .cta-finale { padding: 64px 0 72px; }
   .case-copy { padding: 32px 22px; }
+  .cta-form { grid-template-columns: 1fr; }
+  .form-field-wide { grid-column: auto; }
+  .cta-form .btn { width: 100%; }
   .footer-inner { flex-direction: column; align-items: flex-start; }
 }
 

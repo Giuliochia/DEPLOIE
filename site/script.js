@@ -52,17 +52,20 @@
     window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
   });
 
-  // --- CTA form (front-end only placeholder) ---
+  // --- Contact form test behavior (no data is sent without a backend) ---
   const ctaForm = document.getElementById('ctaForm');
-  const formStatus = document.getElementById('formStatus');
+  const formConfirmation = document.getElementById('formConfirmation');
   ctaForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const value = ctaForm.problema.value.trim();
-    if (!value) {
-      formStatus.textContent = 'Scrivi qualche riga sul problema prima di inviare.';
+    if (!ctaForm.checkValidity()) {
+      ctaForm.reportValidity();
       return;
     }
-    formStatus.textContent = 'Grazie. Ti risponderemo dopo aver letto con attenzione.';
+    ctaForm.hidden = true;
+    formConfirmation.hidden = false;
+    formConfirmation.focus();
     ctaForm.reset();
   });
+
+  document.getElementById('currentYear').textContent = new Date().getFullYear();
 })();
