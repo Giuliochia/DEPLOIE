@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+
+<svg width="158.75mm" height="158.75mm" viewBox="0 0 158.75 158.75" version="1.1" id="svg1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+  <defs id="defs1"></defs>
+  <g id="layer1" transform="translate(-79.110414,-161.39583)">
+    <g id="g22" transform="matrix(0.26458333,0,0,0.26458333,26.193748,106.07966)">
+      <rect style="opacity:1;fill:#d4a72c;fill-opacity:1;stroke:none;stroke-width:1;stroke-dasharray:none;stroke-opacity:1" id="rect21" width="80" height="80" x="460" y="698.56897" rx="9.1428566" ry="9.1428566"></rect>
+      <path id="path21" style="display:inline;opacity:1;fill:#1e1e1b;fill-opacity:1;stroke:none;stroke-width:1;stroke-dasharray:none;stroke-opacity:1" d="m 320,209.06898 c -66.48,0 -120,53.52 -120,120 v 360 c 0,66.48 53.52,120 120,120 h 109.5 v -80.02344 h -61.52344 c -48.752,0 -88,-39.248 -88,-88 v -264 c 0,-48.752 39.248,-88 88,-88 h 264 c 48.752,0 88,39.248 88,88 v 264 c 0,48.752 -39.248,88 -88,88 H 569.5 v 80.02344 H 680 c 66.48,0 120,-53.52 120,-120 v -360 c 0,-66.48 -53.52,-120 -120,-120 z"></path>
+    </g>
+  </g>
+</svg>
