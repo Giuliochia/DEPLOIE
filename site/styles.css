@@ -353,6 +353,13 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
   .hero-ctas .btn { width: 100%; text-align: center; }
 }
 
+@media (max-width: 400px) {
+  .header-inner, .hero-inner, .hero-copy, .hero-ctas { max-width: 100%; min-width: 0; }
+  .menu-toggle { flex: 0 0 40px; }
+  .hero-visual .frame-back { left: 0; }
+  .hero-visual > .gold-square { right: 0; }
+}
+
 /* ===== Reduced motion ===== */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
