@@ -1,0 +1,138 @@
+:root {
+  --ink: #1E1E1B;
+  --gold: #D4A72C;
+  --paper: #F6F4EE;
+  --white: #ffffff;
+  --line: #ded9cc;
+  --content-width: 1120px;
+  --page-padding: clamp(20px, 5vw, 64px);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: Montserrat, Arial, sans-serif;
+  color: var(--ink);
+  background: var(--white);
+}
+
+body,
+h1,
+p {
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+}
+
+a:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 4px;
+}
+
+.project-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.project-shell {
+  width: min(100%, var(--content-width));
+  margin-inline: auto;
+  padding-inline: var(--page-padding);
+}
+
+.project-header {
+  border-bottom: 1px solid var(--line);
+}
+
+.project-header-inner {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.project-brand img {
+  width: 160px;
+}
+
+.project-back-link {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.project-main {
+  flex: 1;
+}
+
+.project-intro {
+  padding-top: clamp(64px, 10vw, 120px);
+  padding-bottom: clamp(48px, 8vw, 96px);
+}
+
+.project-type {
+  margin-bottom: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.project-title {
+  max-width: 18ch;
+  font-size: clamp(36px, 7vw, 72px);
+  line-height: 1.05;
+}
+
+.project-description {
+  max-width: 680px;
+  margin-top: 24px;
+  font-size: clamp(17px, 2vw, 21px);
+}
+
+.project-experience {
+  min-height: 320px;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.project-footer {
+  padding-block: 32px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .project-header-inner {
+    min-height: 72px;
+  }
+
+  .project-brand img {
+    width: 140px;
+  }
+
+  .project-back-link {
+    font-size: 12px;
+  }
+}
