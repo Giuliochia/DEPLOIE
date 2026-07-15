@@ -313,8 +313,10 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
 @media (max-width: 1200px) {
   .nav-desktop { display: none; }
   .menu-toggle { display: flex; }
-  .hero-inner { grid-template-columns: 1fr; }
-  .hero-visual { order: -1; max-width: 440px; }
+  .hero-inner { grid-template-columns: minmax(0, 1fr); }
+  .hero-copy, .hero-visual { min-width: 0; }
+  .hero h1 { max-width: 760px; font-size: clamp(36px, 5vw, 44px); }
+  .hero-visual { order: -1; width: 100%; max-width: 440px; }
   .metodo-head, .tipologie-inner, .personale-inner { grid-template-columns: 1fr; gap: 32px; }
   .metodo-steps { grid-template-columns: 1fr 1fr; }
   .tipologie-cols { grid-template-columns: 1fr; gap: 32px; }
@@ -330,8 +332,6 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
   .header-inner { height: 68px; }
   .logo { height: 34px; }
   .hero { padding: 40px 0 56px; }
-  .hero-ctas { flex-direction: column; align-items: stretch; }
-  .hero-ctas .btn { text-align: center; }
   .metodo-steps { grid-template-columns: 1fr; gap: 32px; }
   .metodo, .tipologie, .personale, .progetti { padding: 64px 0; }
   .principio { padding: 72px 0; }
@@ -344,6 +344,13 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
   .footer-logo { grid-column: 1; grid-row: auto; justify-self: center; height: 88px; }
   .footer-nav { grid-column: 1; grid-row: auto; justify-content: center; }
   .footer-details { grid-column: 1; grid-row: auto; justify-content: center; padding-top: 0; text-align: center; }
+}
+
+@media (max-width: 520px) {
+  .hero-inner { gap: 52px; }
+  .hero h1 { font-size: clamp(32px, 8.75vw, 36px); max-width: 100%; }
+  .hero-ctas { flex-direction: column; align-items: stretch; }
+  .hero-ctas .btn { width: 100%; text-align: center; }
 }
 
 /* ===== Reduced motion ===== */
