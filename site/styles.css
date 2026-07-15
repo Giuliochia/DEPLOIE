@@ -270,16 +270,26 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
 .form-confirmation p { font-size: 15px; }
 
 /* ===== Footer ===== */
-.site-footer { padding: 40px 0; border-top: 1px solid var(--line); }
-.footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
-.footer-logo { height: 20px; }
+.site-footer { padding: 56px 0; border-top: 1px solid var(--line); }
+.footer-inner {
+  display: grid; grid-template-columns: 180px minmax(0, 1fr); grid-template-rows: auto auto;
+  align-items: center; column-gap: 64px;
+}
+.footer-logo { grid-column: 1; grid-row: 1 / 3; justify-self: start; height: 104px; width: auto; }
 .footer-nav {
-  display: flex; gap: 28px; align-items: center; flex-wrap: wrap;
+  grid-column: 2; grid-row: 1; width: 100%;
+  display: flex; justify-content: center; gap: 24px; align-items: center; flex-wrap: wrap;
+  padding-bottom: 20px; border-bottom: 1px solid var(--line);
   font-family: ui-monospace, monospace; font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
   color: var(--body-text);
 }
 .footer-copy { color: #a8a293; }
-.footer-details { width: 100%; display: flex; gap: 14px 28px; flex-wrap: wrap; padding-top: 24px; border-top: 1px solid var(--line); font-family: ui-monospace, monospace; font-size: 11px; color: var(--muted); }
+.footer-details {
+  grid-column: 2; grid-row: 2; width: 100%;
+  display: flex; justify-content: center; align-items: center; gap: 10px 22px; flex-wrap: wrap;
+  padding-top: 20px; font-family: ui-monospace, monospace; font-size: 10px; line-height: 1.6;
+  font-weight: 400; letter-spacing: .02em; color: var(--muted);
+}
 
 /* ===== To top ===== */
 .to-top {
@@ -327,7 +337,10 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
   .cta-form { grid-template-columns: 1fr; }
   .form-field-wide { grid-column: auto; }
   .cta-form .btn { width: 100%; }
-  .footer-inner { flex-direction: column; align-items: flex-start; }
+  .footer-inner { grid-template-columns: 1fr; grid-template-rows: auto; justify-items: center; row-gap: 28px; }
+  .footer-logo { grid-column: 1; grid-row: auto; justify-self: center; height: 88px; }
+  .footer-nav { grid-column: 1; grid-row: auto; justify-content: center; }
+  .footer-details { grid-column: 1; grid-row: auto; justify-content: center; padding-top: 0; text-align: center; }
 }
 
 /* ===== Reduced motion ===== */
