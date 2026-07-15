@@ -58,6 +58,52 @@
     manifestoObserver.observe(manifesto);
   }
 
+  // --- Process system: one narrative entrance, then a light flow while visible ---
+  const processSystem = document.querySelector('[data-process-system]');
+  if (processSystem && !prefersReducedMotion && 'IntersectionObserver' in window) {
+    processSystem.classList.add('process-motion-ready');
+    const processFlow = processSystem.querySelector('.process-flow');
+    const processAnimations = processFlow.querySelectorAll('animateMotion');
+    const processDesktopFlow = window.matchMedia('(min-width: 821px)');
+    let processIsVisible = false;
+    let processFlowHasStarted = false;
+
+    const startProcessFlow = () => {
+      if (!processDesktopFlow.matches) return;
+      if (typeof processFlow.unpauseAnimations === 'function') processFlow.unpauseAnimations();
+      if (!processFlowHasStarted) {
+        processAnimations.forEach((animation) => {
+          if (typeof animation.beginElement === 'function') animation.beginElement();
+        });
+        processFlowHasStarted = true;
+      }
+    };
+
+    const pauseProcessFlow = () => {
+      if (typeof processFlow.pauseAnimations === 'function') processFlow.pauseAnimations();
+    };
+
+    const processObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-active');
+          entry.target.classList.add('is-running');
+          processIsVisible = true;
+          startProcessFlow();
+        } else {
+          entry.target.classList.remove('is-running');
+          processIsVisible = false;
+          pauseProcessFlow();
+        }
+      });
+    }, { threshold: 0.18, rootMargin: '0px 0px -50px 0px' });
+    processObserver.observe(processSystem);
+    processDesktopFlow.addEventListener('change', () => {
+      if (processIsVisible && processDesktopFlow.matches) startProcessFlow();
+      else pauseProcessFlow();
+    });
+  }
+
   // --- Esigenze system: one controlled activation when it enters the viewport ---
   const esigenzeSystem = document.querySelector('[data-es-system]');
   if (esigenzeSystem && !prefersReducedMotion && 'IntersectionObserver' in window) {

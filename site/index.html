@@ -169,14 +169,111 @@
     </div>
   </section>
 
-  <section id="come-lavoriamo" class="metodo">
+  <section id="come-lavoriamo" class="process-system" data-process-system>
     <div class="wrap">
-      <div class="metodo-head reveal"><div><p class="eyebrow">Come lavoriamo</p><h2>Dall’ascolto a un progetto concreto</h2></div></div>
-      <ol class="metodo-steps">
-        <li class="reveal"><span class="step-num">01</span><h3>Conosciamo la tua attività</h3><p>Partiamo da un primo confronto per capire come lavori, quali strumenti utilizzi e cosa vorresti rendere più semplice.</p></li>
-        <li class="reveal"><span class="step-num">02</span><h3>Valutiamo se possiamo essere utili</h3><p>Analizziamo le informazioni raccolte per capire se uno strumento digitale può produrre un miglioramento concreto.</p><p>Se non è la soluzione corretta, oppure se il progetto non rientra nelle nostre competenze, lo diciamo con chiarezza.</p></li>
-        <li class="reveal"><span class="step-num step-num-gold">03</span><h3>Definiamo e realizziamo il progetto</h3><p>Quando esistono le condizioni per procedere, definiamo una proposta chiara e realizziamo il progetto attraverso obiettivi, passaggi e criteri di verifica condivisi.</p></li>
-      </ol>
+      <header class="process-header">
+        <p class="eyebrow process-eyebrow">Come lavoriamo</p>
+        <h2 class="process-title">Ogni progetto deve superare una verifica.</h2>
+        <p class="process-intro">Prima di costruire, verifichiamo che esistano un problema reale, un risultato utile e le competenze corrette per affrontarlo.</p>
+      </header>
+
+      <div class="process-visual">
+        <svg class="process-flow" viewBox="0 0 1200 620" preserveAspectRatio="none" role="presentation" aria-hidden="true">
+          <defs>
+            <pattern id="processMesh" width="10" height="10" patternUnits="userSpaceOnUse">
+              <path d="M10 0H0V10" fill="none" stroke="currentColor" stroke-width=".7"></path>
+            </pattern>
+            <radialGradient id="processQuestionGlow">
+              <stop offset="0" stop-color="#D4A72C" stop-opacity=".1"></stop>
+              <stop offset="1" stop-color="#D4A72C" stop-opacity="0"></stop>
+            </radialGradient>
+            <path id="processMotionInputA" d="M38 168 C180 150 274 244 446 278 C500 289 526 298 557 300"></path>
+            <path id="processMotionInputB" d="M24 332 C164 346 280 314 446 309 C492 308 526 307 557 306"></path>
+            <path id="processMotionInputC" d="M58 468 C188 442 292 370 446 334 C494 323 526 316 557 312"></path>
+            <path id="processMotionBuild" d="M670 306 C760 306 776 142 900 142"></path>
+            <path id="processMotionStop" d="M670 306 C760 306 776 434 900 434"></path>
+          </defs>
+
+          <g class="process-input-routes">
+            <path class="process-route process-route-soft" pathLength="1" d="M20 118 C162 102 274 215 448 270 C494 284 526 294 557 299"></path>
+            <path class="process-route" pathLength="1" d="M38 168 C180 150 274 244 446 278 C500 289 526 298 557 300"></path>
+            <path class="process-route process-route-soft" pathLength="1" d="M8 242 C158 252 282 278 446 292 C494 296 526 301 557 302"></path>
+            <path class="process-route process-route-gold" pathLength="1" d="M24 332 C164 346 280 314 446 309 C492 308 526 307 557 306"></path>
+            <path class="process-route process-route-soft" pathLength="1" d="M18 404 C170 420 286 356 446 324 C494 315 526 310 557 309"></path>
+            <path class="process-route" pathLength="1" d="M58 468 C188 442 292 370 446 334 C494 323 526 316 557 312"></path>
+          </g>
+
+          <g class="process-static-particles">
+            <circle cx="64" cy="182" r="4"></circle><rect x="124" y="116" width="8" height="8"></rect>
+            <rect x="188" y="214" width="6" height="6"></rect><circle class="process-particle-gold" cx="248" cy="152" r="4"></circle>
+            <rect x="292" y="262" width="7" height="7"></rect><circle cx="102" cy="364" r="5"></circle>
+            <rect x="160" y="428" width="10" height="10"></rect><circle class="process-particle-gold" cx="230" cy="390" r="4"></circle>
+            <rect x="326" y="438" width="7" height="7"></rect><circle cx="374" cy="344" r="4"></circle>
+            <rect x="352" y="174" width="8" height="8"></rect><circle class="process-particle-gold" cx="410" cy="250" r="4"></circle>
+          </g>
+
+          <g class="process-filter-graphic">
+            <path class="process-filter-membrane" d="M454 82 C514 152 514 466 454 536 L476 536 C536 466 536 152 476 82 Z"></path>
+            <path class="process-filter-edge" d="M454 82 C514 152 514 466 454 536"></path>
+            <path class="process-filter-edge process-filter-edge-gold" d="M476 82 C536 152 536 466 476 536"></path>
+          </g>
+
+          <g class="process-question-rings">
+            <circle class="process-question-glow" cx="610" cy="306" r="126"></circle>
+            <circle cx="610" cy="306" r="104"></circle>
+            <circle cx="610" cy="306" r="122"></circle>
+          </g>
+
+          <g class="process-output-routes">
+            <path class="process-route process-route-output process-route-build" pathLength="1" d="M670 306 C760 306 776 142 900 142"></path>
+            <path class="process-route process-route-output process-route-stop" pathLength="1" d="M670 306 C760 306 776 434 900 434"></path>
+            <circle class="process-junction-ring" cx="736" cy="306" r="17"></circle>
+            <circle class="process-junction" cx="736" cy="306" r="7"></circle>
+          </g>
+
+          <g class="process-flow-particles">
+            <circle class="process-flow-particle process-flow-particle-gold" r="4"><animateMotion dur="4.8s" begin="indefinite" repeatCount="indefinite"><mpath href="#processMotionInputA"></mpath></animateMotion></circle>
+            <rect class="process-flow-particle" x="-3" y="-3" width="6" height="6"><animateMotion dur="5.6s" begin="indefinite" repeatCount="indefinite"><mpath href="#processMotionInputB"></mpath></animateMotion></rect>
+            <circle class="process-flow-particle" r="3.5"><animateMotion dur="5.2s" begin="indefinite" repeatCount="indefinite"><mpath href="#processMotionInputC"></mpath></animateMotion></circle>
+            <circle class="process-flow-particle process-flow-particle-gold" r="4"><animateMotion dur="4.4s" begin="indefinite" repeatCount="indefinite"><mpath href="#processMotionBuild"></mpath></animateMotion></circle>
+            <rect class="process-flow-particle" x="-3" y="-3" width="6" height="6"><animateMotion dur="4.9s" begin="indefinite" repeatCount="indefinite"><mpath href="#processMotionStop"></mpath></animateMotion></rect>
+          </g>
+        </svg>
+
+        <section class="process-flow-left">
+          <div class="process-caption process-caption-understand">
+            <h3>Capire</h3>
+            <p>Raccogliamo il contesto, gli strumenti già usati e ciò che deve migliorare.</p>
+          </div>
+          <div class="process-concepts" aria-label="Informazioni raccolte">
+            <span class="process-concept process-concept-a">contesto</span>
+            <span class="process-concept process-concept-b">strumenti</span>
+            <span class="process-concept process-concept-c">vincoli</span>
+            <span class="process-concept process-concept-d">obiettivo</span>
+            <span class="process-concept process-concept-e">problema</span>
+          </div>
+        </section>
+
+        <section class="process-flow-center">
+          <div class="process-caption process-caption-evaluate-decide">
+            <h3>Valutare e decidere</h3>
+            <p>Verifichiamo se uno strumento digitale può produrre un risultato concreto e procediamo solo quando esistono condizioni, competenze e obiettivi chiari.</p>
+          </div>
+          <div class="process-filter" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="process-question-shell"><p class="process-question">Ha senso costruirlo?</p></div>
+        </section>
+
+        <section class="process-flow-right">
+          <article class="process-branch process-branch-build">
+            <span class="process-branch-node" aria-hidden="true"></span>
+            <div><h4>Costruire</h4><p>Definiamo obiettivi, passaggi e criteri di verifica prima dello sviluppo.</p></div>
+          </article>
+          <article class="process-branch process-branch-stop">
+            <span class="process-branch-node" aria-hidden="true"></span>
+            <div><h4>Non procedere</h4><p class="process-honesty-statement">Se non è la soluzione corretta, oppure se il progetto non rientra nelle nostre competenze, lo diciamo con chiarezza.</p></div>
+          </article>
+        </section>
+      </div>
     </div>
   </section>
 
