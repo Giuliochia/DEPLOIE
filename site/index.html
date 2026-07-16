@@ -49,16 +49,8 @@
           <a href="#contatti" class="btn btn-primary">Raccontaci la tua attività</a>
         </div>
       </div>
-      <div class="hero-visual" aria-hidden="true">
-        <div class="frame-back"></div>
-        <div class="panel">
-          <div class="panel-bar"><span></span><span></span><span></span></div>
-          <div class="panel-body">
-            <div class="panel-side"><span class="bar bar-strong" style="width:65%"></span><span class="bar" style="width:80%"></span><span class="bar" style="width:50%"></span><span class="bar" style="width:65%"></span><span class="bar" style="width:44%"></span></div>
-            <div class="panel-main"><div class="row"><span class="gold-dot"></span><span class="bar" style="width:70%"></span></div><div class="block block-tint"></div><div class="block"></div><div class="grid2"><div class="block small"></div><div class="block small block-tint"></div></div></div>
-          </div>
-        </div>
-        <span class="gold-square"></span>
+      <div class="hero-visual" data-structure-visual aria-hidden="true">
+        <canvas class="hero-structure-canvas"></canvas>
       </div>
     </div>
   </section>
@@ -178,7 +170,9 @@
       </header>
 
       <div class="process-visual">
-        <svg class="process-flow" viewBox="0 0 1200 620" preserveAspectRatio="none" role="presentation" aria-hidden="true">
+        <div class="process-diagram">
+          <div class="process-diagram-stage">
+            <svg class="process-flow" viewBox="0 0 1200 620" preserveAspectRatio="none" role="presentation" aria-hidden="true">
           <defs>
             <pattern id="processMesh" width="10" height="10" patternUnits="userSpaceOnUse">
               <path d="M10 0H0V10" fill="none" stroke="currentColor" stroke-width=".7"></path>
@@ -218,11 +212,11 @@
             <path class="process-filter-edge process-filter-edge-gold" d="M476 82 C536 152 536 466 476 536"></path>
           </g>
 
-          <g class="process-question-rings">
-            <circle class="process-question-glow" cx="610" cy="306" r="126"></circle>
-            <circle cx="610" cy="306" r="104"></circle>
-            <circle cx="610" cy="306" r="122"></circle>
-          </g>
+              <g class="process-question-rings">
+                <circle class="process-question-glow" cx="610" cy="306" r="140"></circle>
+                <circle cx="610" cy="306" r="112"></circle>
+                <circle cx="610" cy="306" r="132"></circle>
+              </g>
 
           <g class="process-output-routes">
             <path class="process-route process-route-output process-route-build" pathLength="1" d="M670 306 C760 306 776 142 900 142"></path>
@@ -238,41 +232,56 @@
             <circle class="process-flow-particle process-flow-particle-gold" r="4"><animateMotion dur="4.4s" begin="indefinite" repeatCount="indefinite"><mpath href="#processMotionBuild"></mpath></animateMotion></circle>
             <rect class="process-flow-particle" x="-3" y="-3" width="6" height="6"><animateMotion dur="4.9s" begin="indefinite" repeatCount="indefinite"><mpath href="#processMotionStop"></mpath></animateMotion></rect>
           </g>
-        </svg>
+            </svg>
 
-        <section class="process-flow-left">
-          <div class="process-caption process-caption-understand">
-            <h3>Capire</h3>
-            <p>Raccogliamo il contesto, gli strumenti già usati e ciò che deve migliorare.</p>
-          </div>
-          <div class="process-concepts" aria-label="Informazioni raccolte">
-            <span class="process-concept process-concept-a">contesto</span>
-            <span class="process-concept process-concept-b">strumenti</span>
-            <span class="process-concept process-concept-c">vincoli</span>
-            <span class="process-concept process-concept-d">obiettivo</span>
-            <span class="process-concept process-concept-e">problema</span>
-          </div>
-        </section>
+            <section class="process-flow-left">
+              <div class="process-concepts" aria-label="Informazioni raccolte">
+                <span class="process-concept process-concept-a">contesto</span>
+                <span class="process-concept process-concept-b">strumenti</span>
+                <span class="process-concept process-concept-c">vincoli</span>
+                <span class="process-concept process-concept-d">obiettivo</span>
+                <span class="process-concept process-concept-e">problema</span>
+              </div>
+            </section>
 
-        <section class="process-flow-center">
-          <div class="process-caption process-caption-evaluate-decide">
-            <h3>Valutare e decidere</h3>
-            <p>Verifichiamo se uno strumento digitale può produrre un risultato concreto e procediamo solo quando esistono condizioni, competenze e obiettivi chiari.</p>
-          </div>
-          <div class="process-filter" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
-          <div class="process-question-shell"><p class="process-question">Ha senso costruirlo?</p></div>
-        </section>
+            <section class="process-flow-center">
+              <div class="process-filter" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="process-question-shell"><p class="process-question">Ha senso costruirlo?</p></div>
+            </section>
 
-        <section class="process-flow-right">
-          <article class="process-branch process-branch-build">
-            <span class="process-branch-node" aria-hidden="true"></span>
-            <div><h4>Costruire</h4><p>Definiamo obiettivi, passaggi e criteri di verifica prima dello sviluppo.</p></div>
+            <section class="process-flow-right">
+              <article class="process-branch process-branch-build">
+                <span class="process-branch-node" aria-hidden="true"></span>
+                <div><h4>Costruire</h4><p>Definiamo obiettivi, passaggi e criteri di verifica prima dello sviluppo.</p></div>
+              </article>
+              <article class="process-branch process-branch-stop">
+                <span class="process-branch-node" aria-hidden="true"></span>
+                <div><h4>Non procedere</h4><p class="process-honesty-statement">Se non è la soluzione corretta, oppure se il progetto non rientra nelle nostre competenze, lo diciamo con chiarezza.</p></div>
+              </article>
+            </section>
+          </div>
+        </div>
+
+        <div class="process-captions">
+          <article class="process-caption process-caption-understand">
+            <span class="process-caption-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48"><rect x="13" y="13" width="7" height="7"></rect><rect x="28" y="13" width="7" height="7"></rect><rect x="13" y="28" width="7" height="7"></rect><rect x="28" y="28" width="7" height="7"></rect><circle cx="24" cy="24" r="4"></circle></svg>
+            </span>
+            <div class="process-caption-content">
+              <h3>Capire</h3>
+              <p>Raccogliamo il contesto, gli strumenti già usati e ciò che deve migliorare.</p>
+            </div>
           </article>
-          <article class="process-branch process-branch-stop">
-            <span class="process-branch-node" aria-hidden="true"></span>
-            <div><h4>Non procedere</h4><p class="process-honesty-statement">Se non è la soluzione corretta, oppure se il progetto non rientra nelle nostre competenze, lo diciamo con chiarezza.</p></div>
+          <article class="process-caption process-caption-evaluate-decide">
+            <span class="process-caption-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48"><path d="M10 12h28L28 24v11l-8 4V24L10 12Z"></path></svg>
+            </span>
+            <div class="process-caption-content">
+              <h3>Valutare e decidere</h3>
+              <p>Verifichiamo se uno strumento digitale può produrre un risultato concreto. Procediamo solo quando esistono condizioni, competenze e obiettivi chiari.</p>
+            </div>
           </article>
-        </section>
+        </div>
       </div>
     </div>
   </section>
