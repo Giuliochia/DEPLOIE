@@ -18,11 +18,23 @@
       ambientKeep: 0.5,
       goldOrbit: 0.05,
       goldPeakOpacity: 0.55,
-      reducedPreset: Object.freeze({ cohesion: 0.5, structure: 0.3, gold: 0.25 }),
+      reducedPreset: Object.freeze({ p: 0, cohesion: 0.08, structure: 0.05, gold: 0 }),
+    }),
+    network: Object.freeze({
+      maxDistance: 118,
+      maxConnectionsPerParticle: 2,
+      maxConnectionsDesktop: 32,
+      maxConnectionsTablet: 22,
+      maxConnectionsMobile: 0,
+      baseAlpha: 0.28,
+      lineWidth: 0.8,
+      fadeStart: 0.18,
+      fadeEnd: 0.68,
+      updateInterval: 150,
     }),
     motion: Object.freeze({ speed: 0.00022, amplitude: 8 }),
     interaction: Object.freeze({ radius: 145, strength: 6 }),
-    connections: Object.freeze({ maxDistance: 112, lineWidth: 1, opacity: 0.42, ambientOpacity: 0.14 }),
+    connections: Object.freeze({ lineWidth: 1, opacity: 0.42 }),
     opacity: Object.freeze({ particle: 0.72, ambient: 0.34, glow: 0.08 }),
     size: Object.freeze({ nodeMin: 1.5, nodeMax: 3.2, goldMin: 9, goldMax: 14 }),
     colors: Object.freeze({
@@ -54,18 +66,15 @@
   const bridgeConfig = Object.freeze({
     // Sopra 1200 il visual parte a destra del copy: attraversa il centro
     // solo nella fascia vuota tra le due sezioni, scende lungo la gronda a
-    // sinistra del titolo e si impianta nella colonna di "Essere trovati".
-    // Tra 901 e 1200 la Hero è impilata (visual già a sinistra) ma la
-    // griglia di Esigenze conserva la colonna d'ingresso. Sotto 900 la
-    // griglia è a colonna singola: l'arrivo è a fianco dell'hub, sul lato
-    // con più spazio libero.
+    // sinistra del titolo e raggiunge l'area di costruzione. Tra 901 e 1200
+    // la Hero è impilata (visual già a sinistra), mentre sotto 900 il
+    // percorso riduce progressivamente la deviazione laterale.
     tiers: Object.freeze([
       Object.freeze({ minWidth: 1201, recipe: 'gronda', scaleEnd: 0.72, rotateStartDeg: 5 }),
       Object.freeze({ minWidth: 901, recipe: 'colonna', scaleEnd: 0.7, rotateStartDeg: 4 }),
       Object.freeze({ minWidth: 621, recipe: 'fianco-hub', scaleEnd: 0.62, rotateStartDeg: 4 }),
-      // Sotto 620 l'hub è centrato e il fianco è stretto: il gruppo arriva
-      // più piccolo, appoggiato al margine con più spazio; una parte può
-      // restare dietro l'hub, mai la maggioranza.
+      // Sotto 620 il gruppo arriva più piccolo e senza deviazione laterale
+      // dentro lo spazio riservato, prima dei contenuti.
       Object.freeze({ minWidth: 0, recipe: 'fianco-hub', scaleEnd: 0.45, rotateStartDeg: 3 }),
     ]),
     // Morbidezza della curva che MotionPath fa passare per i waypoint.
@@ -74,9 +83,6 @@
     scrub: 1,
     // Frazione di viewport a cui il punto d'arrivo è considerato "raggiunto".
     arrivalAnchor: 0.56,
-    // Quota d'arrivo nella colonna d'ingresso (frazione dell'altezza di
-    // Esigenze): sopra la card, mai a ridosso dell'hub.
-    endColumnYFactor: 0.18,
     // Ampiezza della "S" nelle ricette senza gronda (frazione di viewport).
     bandSway: 0.06,
     // Margine minimo dal bordo viewport per il punto d'arrivo.
@@ -97,6 +103,72 @@
     const t = clamp((value - edgeA) / (edgeB - edgeA), 0, 1);
     return t * t * (3 - 2 * t);
   };
+  const clamp01 = (value) => Math.max(0, Math.min(1, value));
+  const remap01 = (value, start, end) => {
+    if (end === start) return value >= end ? 1 : 0;
+    return clamp01((value - start) / (end - start));
+  };
+
+  function getDistanceSquared(first, second) {
+    const dx = first.x - second.x;
+    const dy = first.y - second.y;
+    return dx * dx + dy * dy;
+  }
+
+  function buildTemporaryConnections(
+    particles,
+    maxDistance,
+    maxConnectionsPerParticle,
+    maxTotalConnections,
+  ) {
+    const maxDistanceSquared = maxDistance * maxDistance;
+    const connections = [];
+    const connectionCount = new Uint8Array(particles.length);
+
+    for (let firstIndex = 0; firstIndex < particles.length; firstIndex += 1) {
+      if (connectionCount[firstIndex] >= maxConnectionsPerParticle) continue;
+      const candidates = [];
+
+      for (let secondIndex = firstIndex + 1; secondIndex < particles.length; secondIndex += 1) {
+        if (connectionCount[secondIndex] >= maxConnectionsPerParticle) continue;
+        const distanceSquared = getDistanceSquared(
+          particles[firstIndex],
+          particles[secondIndex],
+        );
+        if (distanceSquared <= maxDistanceSquared) {
+          candidates.push({
+            a: firstIndex,
+            b: secondIndex,
+            distanceSquared,
+          });
+        }
+      }
+
+      candidates.sort((first, second) => first.distanceSquared - second.distanceSquared);
+      for (const candidate of candidates) {
+        if (
+          connectionCount[candidate.a] >= maxConnectionsPerParticle
+          || connectionCount[candidate.b] >= maxConnectionsPerParticle
+          || connections.length >= maxTotalConnections
+        ) {
+          continue;
+        }
+        connections.push(candidate);
+        connectionCount[candidate.a] += 1;
+        connectionCount[candidate.b] += 1;
+        if (
+          connectionCount[firstIndex] >= maxConnectionsPerParticle
+          || connections.length >= maxTotalConnections
+        ) {
+          break;
+        }
+      }
+
+      if (connections.length >= maxTotalConnections) break;
+    }
+
+    return connections;
+  }
 
   function seededRandom(seed) {
     let value = seed >>> 0;
@@ -136,6 +208,8 @@
       this.reducedMotion = motionQuery.matches;
       this.pointer = { active: false, x: 0, y: 0 };
       this.particles = [];
+      this.temporaryConnections = [];
+      this.lastNetworkUpdate = 0;
       this.running = false;
       this.visible = false;
       this.frame = 0;
@@ -232,6 +306,8 @@
       });
       this.structuralCount = structuralCount;
       this.connectionOrder = shuffledOrder(Math.max(0, structuralCount - 1), random);
+      this.temporaryConnections = [];
+      this.lastNetworkUpdate = 0;
     }
 
     resize() {
@@ -285,6 +361,37 @@
       });
     }
 
+    getMaxTemporaryConnections() {
+      const network = this.config.network;
+      if (window.innerWidth <= this.config.breakpoints.mobile) return network.maxConnectionsMobile;
+      if (window.innerWidth <= this.config.breakpoints.tablet) return network.maxConnectionsTablet;
+      return network.maxConnectionsDesktop;
+    }
+
+    updateTemporaryConnections(now, staticState = false) {
+      const network = this.config.network;
+      const maxTotalConnections = this.getMaxTemporaryConnections();
+      const networkFade = 1 - remap01(
+        clamp(this.narrative.p, 0, 1),
+        network.fadeStart,
+        network.fadeEnd,
+      );
+      if (staticState || maxTotalConnections === 0 || networkFade <= 0.01) {
+        this.temporaryConnections = [];
+        return;
+      }
+      if (this.lastNetworkUpdate && now - this.lastNetworkUpdate < network.updateInterval) {
+        return;
+      }
+      this.temporaryConnections = buildTemporaryConnections(
+        this.particles,
+        network.maxDistance,
+        network.maxConnectionsPerParticle,
+        maxTotalConnections,
+      );
+      this.lastNetworkUpdate = now;
+    }
+
     drawLine(first, second, opacity, width = this.config.connections.lineWidth) {
       this.context.beginPath();
       this.context.moveTo(first.x, first.y);
@@ -295,14 +402,23 @@
       this.context.stroke();
     }
 
-    drawAmbientConnections(structureProgress) {
-      const ambient = this.particles.slice(this.structuralCount);
-      for (let index = 0; index < ambient.length - 1; index += 2) {
-        const first = ambient[index];
-        const second = ambient[index + 1];
-        if (!second || Math.hypot(first.x - second.x, first.y - second.y) > this.config.connections.maxDistance) continue;
-        this.drawLine(first, second, this.config.connections.ambientOpacity * (1 - structureProgress));
-      }
+    drawTemporaryConnections(constructionProgress, staticState = false) {
+      if (staticState || !this.temporaryConnections.length) return;
+      const network = this.config.network;
+      const networkFade = 1 - remap01(
+        constructionProgress,
+        network.fadeStart,
+        network.fadeEnd,
+      );
+      this.temporaryConnections.forEach((connection) => {
+        const distance = Math.sqrt(connection.distanceSquared);
+        const distanceAlpha = 1 - clamp01(distance / network.maxDistance);
+        const alpha = network.baseAlpha * distanceAlpha * networkFade;
+        if (alpha <= 0.01) return;
+        const first = this.particles[connection.a];
+        const second = this.particles[connection.b];
+        this.drawLine(first, second, alpha, network.lineWidth);
+      });
     }
 
     drawStructureConnections(structureProgress) {
@@ -316,14 +432,20 @@
         const rank = order[index] !== undefined ? order[index] : index;
         const stagger = clamp(structureProgress * (nodes.length + 4) - rank, 0, 1);
         if (stagger <= 0) continue;
-        this.drawLine(nodes[index], nodes[index + 1], this.config.connections.opacity * stagger);
+        this.drawLine(
+          nodes[index],
+          nodes[index + 1],
+          this.config.connections.opacity * stagger,
+        );
       }
     }
 
     drawParticles(structureProgress) {
       this.particles.forEach((particle) => {
-        const structuralOpacity = lerp(0.46, this.config.opacity.particle, structureProgress);
-        this.context.globalAlpha = particle.structural ? structuralOpacity : this.config.opacity.ambient;
+        const existingAlpha = particle.structural
+          ? lerp(0.46, this.config.opacity.particle, structureProgress)
+          : this.config.opacity.ambient;
+        this.context.globalAlpha = existingAlpha;
         this.context.fillStyle = particle.structural ? this.colors.node : this.colors.muted;
         this.context.beginPath();
         if (particle.shape === 'square') {
@@ -364,8 +486,10 @@
     render(now, staticState = false) {
       this.context.clearRect(0, 0, this.width, this.height);
       this.positionParticles(now, staticState);
+      const constructionProgress = clamp(this.narrative.p, 0, 1);
       const structureProgress = clamp(this.narrative.structure, 0, 1);
-      this.drawAmbientConnections(structureProgress);
+      this.updateTemporaryConnections(now, staticState);
+      this.drawTemporaryConnections(constructionProgress, staticState);
       this.drawStructureConnections(structureProgress);
       this.drawParticles(structureProgress);
       this.drawGoldElement(now);
@@ -374,9 +498,10 @@
 
     drawStatic() {
       if (!this.width || !this.height || !this.particles.length) return;
-      // Stato statico per reduced motion: orientato e parzialmente
-      // organizzato, ma chiaramente incompleto. Nessuna animazione.
+      // Reduced motion mantiene la Hero come materia statica. La struttura
+      // incompleta di Esigenze resta affidata al fallback SVG già presente.
       const preset = this.config.formation.reducedPreset;
+      this.narrative.p = preset.p;
       this.narrative.cohesion = preset.cohesion;
       this.narrative.structure = preset.structure;
       this.narrative.gold = preset.gold;
@@ -431,6 +556,7 @@
       cancelAnimationFrame(this.resizeFrame);
       this.resizeObserver.disconnect();
       this.visibilityObserver.disconnect();
+      this.temporaryConnections = [];
       document.removeEventListener('pointermove', this.onPointerMove);
       document.removeEventListener('pointerleave', this.onPointerLeave);
       this.motionQuery.removeEventListener('change', this.onMotionChange);
@@ -451,12 +577,13 @@
     const heroSection = el.closest('.hero');
     const esSystem = document.querySelector('[data-es-system]');
     const head = document.querySelector('.esigenze-head');
-    const entryNode = document.querySelector('.es-node-entry');
-    const hub = document.querySelector('.es-hub');
-    if (!heroSection || !esSystem || !head || !entryNode || !hub) return null;
+    const hub = esSystem ? esSystem.querySelector('[data-es-arrival]') : null;
+    const contentNodes = esSystem ? Array.from(esSystem.querySelectorAll('.es-node')) : [];
+    if (!heroSection || !esSystem || !head || !hub || !contentNodes.length) return null;
 
     window.gsap.registerPlugin(window.ScrollTrigger, window.MotionPathPlugin);
     const gsap = window.gsap;
+    esSystem.classList.add('es-bridge-active');
 
     let ctx = null;
     let rebuildFrame = 0;
@@ -483,33 +610,25 @@
 
     // I waypoint sono ancorati al layout reale, mai a pixel assoluti:
     // - "gronda": attraversa il centro solo nella fascia vuota tra le due
-    //   sezioni, scende nella gronda a sinistra del blocco testuale di
-    //   Esigenze e si impianta nella colonna di "Essere trovati";
+    //   sezioni e scende nella gronda a sinistra del blocco testuale;
     // - "colonna": Hero impilata, niente gronda utile — passa nella fascia
-    //   libera sotto l'intro e si impianta nella stessa colonna;
-    // - "fianco-hub": griglia a colonna singola — arriva a fianco dell'hub,
-    //   sul lato con più spazio libero, mai dietro di esso.
+    //   libera sotto l'intro;
+    // - "fianco-hub": su layout stretti riduce la deviazione laterale.
+    // Tutte le ricette terminano nell'area trasparente riservata alla
+    // costruzione, sul lato opposto rispetto ai contenuti.
     const measureWaypoints = (tier) => {
       const base = pageRect(el);
       const heroR = pageRect(heroSection);
       const headR = pageRect(head);
       const esR = pageRect(esSystem);
-      const entryR = pageRect(entryNode);
       const hubR = pageRect(hub);
       const viewportW = window.innerWidth;
       const halfEnd = (base.width * tier.scaleEnd) / 2;
 
-      let end;
-      if (tier.recipe === 'fianco-hub') {
-        const freeRight = viewportW - hubR.right >= hubR.left;
-        const rawX = freeRight ? (hubR.right + viewportW) / 2 : hubR.left / 2;
-        end = {
-          x: clamp(rawX, halfEnd + config.edgeMargin, viewportW - halfEnd - config.edgeMargin),
-          y: hubR.cy,
-        };
-      } else {
-        end = { x: entryR.cx, y: esR.top + esR.height * config.endColumnYFactor };
-      }
+      const end = {
+        x: clamp(hubR.cx, halfEnd + config.edgeMargin, viewportW - halfEnd - config.edgeMargin),
+        y: hubR.cy,
+      };
 
       let mids;
       if (tier.recipe === 'gronda') {
@@ -520,7 +639,7 @@
           { x: gutterX, y: headR.cy },
         ];
       } else {
-        const sway = viewportW * config.bandSway;
+        const sway = window.innerWidth <= 620 ? 0 : viewportW * config.bandSway;
         mids = [
           { x: lerp(base.cx, end.x, 0.4) + sway, y: (heroR.bottom + headR.top) / 2 },
           { x: lerp(base.cx, end.x, 0.8) - sway, y: (headR.bottom + esR.top) / 2 },
@@ -579,6 +698,20 @@
         // affianca il blocco testuale di Esigenze è già vicino alla misura
         // d'arrivo e resta dentro la gronda invece di coprire il titolo.
         timeline.to(el, { scale: tier.scaleEnd, ease: 'power2.out' }, 0);
+        contentNodes.forEach((node, index) => {
+          const stacked = window.innerWidth <= 760;
+          timeline.fromTo(node, {
+            opacity: 0.72,
+            x: stacked ? 0 : 14,
+            y: stacked ? 10 : 0,
+          }, {
+            opacity: 1,
+            x: 0,
+            y: 0,
+            duration: 0.22,
+            ease: 'power1.out',
+          }, 0.48 + index * 0.1);
+        });
       });
       syncNarrative(0);
       window.ScrollTrigger.refresh();
@@ -603,6 +736,7 @@
         window.removeEventListener('load', scheduleBuild);
         if (ctx) ctx.revert();
         ctx = null;
+        esSystem.classList.remove('es-bridge-active');
       },
     };
   }
@@ -741,52 +875,6 @@
     processDesktopFlow.addEventListener('change', () => {
       if (processIsVisible && processDesktopFlow.matches) startProcessFlow();
       else pauseProcessFlow();
-    });
-  }
-
-  // --- Esigenze system: one controlled activation when it enters the viewport ---
-  const esigenzeSystem = document.querySelector('[data-es-system]');
-  if (esigenzeSystem && !prefersReducedMotion && 'IntersectionObserver' in window) {
-    esigenzeSystem.classList.add('es-motion-ready');
-    const esigenzeConnections = esigenzeSystem.querySelector('.es-connections');
-    const flowAnimations = esigenzeConnections.querySelectorAll('animateMotion');
-    const desktopFlow = window.matchMedia('(min-width: 901px)');
-    let systemIsVisible = false;
-    let flowHasStarted = false;
-
-    const startFlow = () => {
-      if (!desktopFlow.matches) return;
-      if (typeof esigenzeConnections.unpauseAnimations === 'function') esigenzeConnections.unpauseAnimations();
-      if (!flowHasStarted) {
-        flowAnimations.forEach((animation) => {
-          if (typeof animation.beginElement === 'function') animation.beginElement();
-        });
-        flowHasStarted = true;
-      }
-    };
-
-    const pauseFlow = () => {
-      if (typeof esigenzeConnections.pauseAnimations === 'function') esigenzeConnections.pauseAnimations();
-    };
-
-    const esigenzeObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-active');
-          entry.target.classList.add('is-running');
-          systemIsVisible = true;
-          startFlow();
-        } else {
-          entry.target.classList.remove('is-running');
-          systemIsVisible = false;
-          pauseFlow();
-        }
-      });
-    }, { threshold: 0.25, rootMargin: '0px 0px -40px 0px' });
-    esigenzeObserver.observe(esigenzeSystem);
-    desktopFlow.addEventListener('change', () => {
-      if (systemIsVisible && desktopFlow.matches) startFlow();
-      else pauseFlow();
     });
   }
 

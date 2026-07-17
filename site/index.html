@@ -63,81 +63,58 @@
         <p class="esigenze-intro">Alcuni problemi si ripetono: farsi capire, organizzare meglio il lavoro e rendere più semplice il rapporto con i clienti.</p>
       </div>
       <div class="es-system" data-es-system>
-        <svg class="es-connections" viewBox="0 0 1200 520" preserveAspectRatio="none" aria-hidden="true">
-          <defs>
-            <marker id="es-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto">
-              <path d="M 0 0 L 8 4 L 0 8" class="es-arrow-head"></path>
-            </marker>
-            <path id="es-flow-top" d="M218 160 C350 154 314 276 463 257 C555 250 650 234 731 234 H812 Q840 234 840 207 V164 Q840 143 864 143 H936"></path>
-            <path id="es-flow-bottom" d="M228 345 C340 360 350 294 463 273 C555 266 650 300 731 300 H812 Q840 300 840 326 V381 Q840 405 864 405 H936"></path>
-          </defs>
-          <g class="es-chaos-lines">
-            <path class="es-path es-path-soft" pathLength="1" d="M245 105 C330 96 336 210 463 246"></path>
-            <path class="es-path es-path-soft" pathLength="1" d="M218 160 C350 154 314 276 463 257"></path>
-            <path class="es-path es-path-main" pathLength="1" marker-end="url(#es-arrow)" d="M270 260 C350 260 390 260 463 260"></path>
-            <path class="es-path es-path-soft" pathLength="1" d="M228 345 C340 360 350 294 463 273"></path>
-            <path class="es-path es-path-soft" pathLength="1" d="M258 414 C338 408 350 320 463 282"></path>
-            <circle cx="278" cy="125" r="3" class="es-particle"></circle>
-            <circle cx="326" cy="203" r="4" class="es-particle"></circle>
-            <circle cx="374" cy="324" r="3" class="es-particle"></circle>
-            <rect x="298" y="378" width="7" height="7" class="es-particle es-particle-gold"></rect>
-            <rect x="405" y="216" width="6" height="6" class="es-particle"></rect>
-          </g>
-          <g class="es-order-lines">
-            <path class="es-path es-path-soft" pathLength="1" d="M731 220 H800 Q825 220 825 195 V150 Q825 128 850 128 H930"></path>
-            <path class="es-path es-path-main" pathLength="1" marker-end="url(#es-arrow)" d="M731 234 H812 Q840 234 840 207 V164 Q840 143 864 143 H936"></path>
-            <path class="es-path es-path-soft" pathLength="1" d="M731 286 H800 Q825 286 825 310 V366 Q825 390 850 390 H930"></path>
-            <path class="es-path es-path-main" pathLength="1" marker-end="url(#es-arrow)" d="M731 300 H812 Q840 300 840 326 V381 Q840 405 864 405 H936"></path>
-          </g>
-          <g class="es-flow-particles">
-            <circle r="3.5" class="es-flow-particle es-flow-particle-gold">
-              <animateMotion dur="3.4s" begin="indefinite" repeatCount="indefinite" calcMode="spline" keyPoints="0;0.44;1" keyTimes="0;0.48;1" keySplines=".4 0 .6 1;.4 0 .6 1"><mpath href="#es-flow-top"></mpath></animateMotion>
-            </circle>
-            <rect x="-3" y="-3" width="6" height="6" rx="1" class="es-flow-particle">
-              <animateMotion dur="4.1s" begin="indefinite" repeatCount="indefinite" calcMode="spline" keyPoints="0;0.44;1" keyTimes="0;0.52;1" keySplines=".35 0 .65 1;.35 0 .65 1"><mpath href="#es-flow-top"></mpath></animateMotion>
-            </rect>
-            <circle r="2.5" class="es-flow-particle">
-              <animateMotion dur="3.8s" begin="indefinite" repeatCount="indefinite" calcMode="spline" keyPoints="0;0.44;1" keyTimes="0;0.46;1" keySplines=".45 0 .55 1;.45 0 .55 1"><mpath href="#es-flow-bottom"></mpath></animateMotion>
-            </circle>
-            <rect x="-2.5" y="-2.5" width="5" height="5" rx="1" class="es-flow-particle es-flow-particle-gold">
-              <animateMotion dur="4.4s" begin="indefinite" repeatCount="indefinite" calcMode="spline" keyPoints="0;0.44;1" keyTimes="0;0.5;1" keySplines=".4 0 .6 1;.4 0 .6 1"><mpath href="#es-flow-bottom"></mpath></animateMotion>
-            </rect>
-          </g>
-        </svg>
-
-        <div class="es-hub">
-          <img src="assets/logo-vertical-color.svg" alt="DEPLOIE">
+        <div class="es-hub" data-es-arrival aria-hidden="true">
+          <!-- Fallback statico: struttura ordinata ma volutamente incompleta. -->
+          <svg class="es-static-structure" viewBox="0 0 360 320" role="presentation">
+            <g class="es-static-lines">
+              <path d="M116 266 C86 252 70 226 70 192 V121 C70 86 92 61 126 52"></path>
+              <path d="M151 46 H226"></path>
+              <path d="M252 55 C280 68 291 92 291 124 V210"></path>
+              <path d="M282 233 C272 249 257 260 236 268"></path>
+              <path d="M136 273 H161"></path>
+            </g>
+            <g class="es-static-nodes">
+              <circle cx="70" cy="151" r="4"></circle>
+              <rect x="89" y="77" width="7" height="7"></rect>
+              <circle cx="188" cy="46" r="3"></circle>
+              <rect x="287" y="139" width="7" height="7"></rect>
+              <circle cx="260" cy="256" r="4"></circle>
+              <rect class="es-static-accent" x="178" y="266" width="14" height="14" rx="1"></rect>
+            </g>
+          </svg>
         </div>
 
-        <article class="es-node es-node-entry">
-          <span class="es-node-icon" aria-hidden="true">
-            <svg viewBox="0 0 32 32"><circle cx="14" cy="14" r="7"></circle><path d="m19 19 6 6"></path></svg>
-          </span>
-          <div>
-            <h3>Essere trovati</h3>
-            <p>Presenza online chiara e orientata all’azione.</p>
-          </div>
-        </article>
+        <div class="es-content">
+          <article class="es-node es-node-entry">
+            <span class="es-node-icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32"><circle cx="14" cy="14" r="7"></circle><path d="m19 19 6 6"></path></svg>
+            </span>
+            <div>
+              <h3>Essere trovati</h3>
+              <p>Presenza online chiara e orientata all’azione.</p>
+            </div>
+          </article>
 
-        <article class="es-node es-node-control">
-          <span class="es-node-icon" aria-hidden="true">
-            <svg viewBox="0 0 32 32"><path d="M7 25V19M13 25V14M19 25V10M25 25V6"></path><path d="m7 14 6-4 6 1 6-6"></path></svg>
-          </span>
-          <div>
-            <h3>Tenere il lavoro sotto controllo</h3>
-            <p>Strumenti semplici costruiti sul processo reale.</p>
-          </div>
-        </article>
+          <article class="es-node es-node-control">
+            <span class="es-node-icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32"><path d="M7 25V19M13 25V14M19 25V10M25 25V6"></path><path d="m7 14 6-4 6 1 6-6"></path></svg>
+            </span>
+            <div>
+              <h3>Tenere il lavoro sotto controllo</h3>
+              <p>Strumenti semplici costruiti sul processo reale.</p>
+            </div>
+          </article>
 
-        <article class="es-node es-node-clients">
-          <span class="es-node-icon" aria-hidden="true">
-            <svg viewBox="0 0 32 32"><circle cx="11" cy="11" r="4"></circle><circle cx="22" cy="12" r="3"></circle><path d="M4 26c0-5 3-8 7-8s7 3 7 8M18 20c1-1 2-2 4-2 4 0 6 3 6 7"></path></svg>
-          </span>
-          <div>
-            <h3>Semplificare il rapporto con i clienti</h3>
-            <p>Contatti, accessi, prenotazioni e informazioni più fluidi.</p>
-          </div>
-        </article>
+          <article class="es-node es-node-clients">
+            <span class="es-node-icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32"><circle cx="11" cy="11" r="4"></circle><circle cx="22" cy="12" r="3"></circle><path d="M4 26c0-5 3-8 7-8s7 3 7 8M18 20c1-1 2-2 4-2 4 0 6 3 6 7"></path></svg>
+            </span>
+            <div>
+              <h3>Semplificare il rapporto con i clienti</h3>
+              <p>Contatti, accessi, prenotazioni e informazioni più fluidi.</p>
+            </div>
+          </article>
+        </div>
       </div>
     </div>
   </section>
