@@ -1,9 +1,10 @@
+import * as THREE from './vendor/three/three.module.min.js';
+
 (() => {
   'use strict';
 
-  // --- Shared visual grammar: particles → connections → structure → verification ---
+  // --- Shared visual grammar: particles → volume → structure → verification ---
   const visualGrammar = Object.freeze({
-    density: Object.freeze({ desktop: 38, tablet: 30, mobile: 24 }),
     breakpoints: Object.freeze({ mobile: 620, tablet: 1200 }),
     // Gradi di costruzione narrativa guidati esclusivamente dallo scroll
     // (mai dal tempo): la Hero parte quasi slegata, l'arrivo in Esigenze è
@@ -20,28 +21,36 @@
       goldPeakOpacity: 0.55,
       reducedPreset: Object.freeze({ p: 0, cohesion: 0.08, structure: 0.05, gold: 0 }),
     }),
-    network: Object.freeze({
-      maxDistance: 118,
-      maxConnectionsPerParticle: 2,
-      maxConnectionsDesktop: 32,
-      maxConnectionsTablet: 22,
-      maxConnectionsMobile: 0,
-      baseAlpha: 0.28,
-      lineWidth: 0.8,
-      fadeStart: 0.18,
-      fadeEnd: 0.68,
-      updateInterval: 150,
-    }),
-    motion: Object.freeze({ speed: 0.00022, amplitude: 8 }),
-    interaction: Object.freeze({ radius: 145, strength: 6 }),
-    connections: Object.freeze({ lineWidth: 1, opacity: 0.42 }),
-    opacity: Object.freeze({ particle: 0.72, ambient: 0.34, glow: 0.08 }),
-    size: Object.freeze({ nodeMin: 1.5, nodeMax: 3.2, goldMin: 9, goldMax: 14 }),
-    colors: Object.freeze({
-      node: '--visual-node',
-      muted: '--visual-node-muted',
-      connection: '--visual-connection',
-      accent: '--visual-accent',
+    three: Object.freeze({
+      particleCountDesktop: 72,
+      particleCountTablet: 54,
+      particleCountMobile: 36,
+      cloudWidth: 420,
+      cloudHeight: 300,
+      cloudDepth: 520,
+      cloudDepthMobile: 300,
+      cameraFov: 42,
+      cameraZ: 560,
+      cameraNear: 1,
+      cameraFar: 2000,
+      pointSizeDesktop: 3.2,
+      pointSizeTablet: 3,
+      pointSizeMobile: 3.4,
+      formationStart: 0.08,
+      formationEnd: 0.78,
+      delayMin: 0,
+      delayMax: 0.38,
+      durationMin: 0.34,
+      durationMax: 0.68,
+      targetDepth: 8,
+      targetSize: 280,
+      ambientAmount: 5,
+      ambientAmountMobile: 3.2,
+      cameraDriftX: 7,
+      cameraDriftY: 4,
+      opacity: 0.82,
+      pixelRatioMax: 2,
+      color: '--visual-node',
     }),
     // Ordered points follow the centre line of the original DEPLOIE symbol,
     // preserving its rounded proportions and the opening at the bottom.
@@ -109,116 +118,42 @@
     return clamp01((value - start) / (end - start));
   };
 
-  function getDistanceSquared(first, second) {
-    const dx = first.x - second.x;
-    const dy = first.y - second.y;
-    return dx * dx + dy * dy;
-  }
-
-  function buildTemporaryConnections(
-    particles,
-    maxDistance,
-    maxConnectionsPerParticle,
-    maxTotalConnections,
-  ) {
-    const maxDistanceSquared = maxDistance * maxDistance;
-    const connections = [];
-    const connectionCount = new Uint8Array(particles.length);
-
-    for (let firstIndex = 0; firstIndex < particles.length; firstIndex += 1) {
-      if (connectionCount[firstIndex] >= maxConnectionsPerParticle) continue;
-      const candidates = [];
-
-      for (let secondIndex = firstIndex + 1; secondIndex < particles.length; secondIndex += 1) {
-        if (connectionCount[secondIndex] >= maxConnectionsPerParticle) continue;
-        const distanceSquared = getDistanceSquared(
-          particles[firstIndex],
-          particles[secondIndex],
-        );
-        if (distanceSquared <= maxDistanceSquared) {
-          candidates.push({
-            a: firstIndex,
-            b: secondIndex,
-            distanceSquared,
-          });
-        }
-      }
-
-      candidates.sort((first, second) => first.distanceSquared - second.distanceSquared);
-      for (const candidate of candidates) {
-        if (
-          connectionCount[candidate.a] >= maxConnectionsPerParticle
-          || connectionCount[candidate.b] >= maxConnectionsPerParticle
-          || connections.length >= maxTotalConnections
-        ) {
-          continue;
-        }
-        connections.push(candidate);
-        connectionCount[candidate.a] += 1;
-        connectionCount[candidate.b] += 1;
-        if (
-          connectionCount[firstIndex] >= maxConnectionsPerParticle
-          || connections.length >= maxTotalConnections
-        ) {
-          break;
-        }
-      }
-
-      if (connections.length >= maxTotalConnections) break;
-    }
-
-    return connections;
-  }
-
-  function seededRandom(seed) {
+  function seededValue(seed) {
     let value = seed >>> 0;
-    return () => {
-      value += 0x6D2B79F5;
-      let result = value;
-      result = Math.imul(result ^ (result >>> 15), result | 1);
-      result ^= result + Math.imul(result ^ (result >>> 7), result | 61);
-      return ((result ^ (result >>> 14)) >>> 0) / 4294967296;
-    };
+    value += 0x6D2B79F5;
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
   }
 
-  // Un ordine casuale (non l'ordine geometrico) in cui i segmenti del
-  // contorno raggiungono piena opacità: senza questo, i segmenti si
-  // connettono sempre a partire dallo stesso punto, tracciando un arco
-  // unico e fedele al profilo reale del marchio anche quando incompleto.
-  // Mescolando l'ordine, i tratti mancanti restano distribuiti lungo tutto
-  // il profilo invece che concentrati in un solo punto.
-  function shuffledOrder(length, random) {
-    const order = Array.from({ length }, (_, index) => index);
-    for (let i = order.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(random() * (i + 1));
-      const tmp = order[i];
-      order[i] = order[j];
-      order[j] = tmp;
-    }
-    return order;
-  }
+  const rangeFromSeed = (seed, min, max) => lerp(min, max, seededValue(seed));
+  const smoothstep01 = (value) => value * value * (3 - 2 * value);
 
   class StructureVisual {
     constructor(root, config, motionQuery) {
       this.root = root;
       this.canvas = root.querySelector('canvas');
-      this.context = this.canvas.getContext('2d', { alpha: true });
       this.config = config;
       this.motionQuery = motionQuery;
       this.reducedMotion = motionQuery.matches;
-      this.pointer = { active: false, x: 0, y: 0 };
-      this.particles = [];
-      this.temporaryConnections = [];
-      this.lastNetworkUpdate = 0;
       this.running = false;
       this.visible = false;
       this.frame = 0;
       this.resizeFrame = 0;
       this.width = 0;
       this.height = 0;
-      // Stato narrativo corrente: viene scritto dall'esterno (il ponte
-      // Hero → Esigenze) in funzione della posizione di scroll. Il tempo
-      // non lo fa mai avanzare: al tempo resta solo il respiro ambientale.
+      this.particleCount = 0;
+      this.positions = null;
+      this.startPositions = null;
+      this.targetPositions = null;
+      this.delays = null;
+      this.durations = null;
+      this.phases = null;
+      this.geometry = null;
+      this.points = null;
+
+      // Stato narrativo corrente: continua a essere scritto esclusivamente
+      // dal ponte Hero → Esigenze. Il tempo anima solo un respiro minimo.
       this.narrative = {
         p: 0,
         cohesion: config.formation.cohesionStart,
@@ -227,17 +162,35 @@
       };
       this.onMotionModeChange = null;
 
-      this.onPointerMove = this.handlePointerMove.bind(this);
-      this.onPointerLeave = this.handlePointerLeave.bind(this);
+      this.scene = new THREE.Scene();
+      this.camera = new THREE.PerspectiveCamera(
+        config.three.cameraFov,
+        1,
+        config.three.cameraNear,
+        config.three.cameraFar,
+      );
+      this.camera.position.z = config.three.cameraZ;
+      this.renderer = new THREE.WebGLRenderer({
+        canvas: this.canvas,
+        alpha: true,
+        antialias: true,
+        powerPreference: 'high-performance',
+      });
+      this.renderer.setClearColor(0x000000, 0);
+
+      const styles = getComputedStyle(document.documentElement);
+      const neutralColor = styles.getPropertyValue(config.three.color).trim();
+      this.material = new THREE.PointsMaterial({
+        color: new THREE.Color(neutralColor || '#1E1E1B'),
+        opacity: config.three.opacity,
+        transparent: true,
+        size: config.three.pointSizeDesktop,
+        sizeAttenuation: true,
+        depthWrite: false,
+      });
+
       this.onMotionChange = this.handleMotionChange.bind(this);
       this.onResize = this.scheduleResize.bind(this);
-
-      // Sul documento, non sul contenitore: il contenitore ha
-      // pointer-events:none per non intercettare mai testi, CTA e selezione
-      // mentre attraversa la pagina. Il raggio d'interazione limita
-      // comunque l'effetto alla zona del gruppo.
-      document.addEventListener('pointermove', this.onPointerMove, { passive: true });
-      document.addEventListener('pointerleave', this.onPointerLeave, { passive: true });
       this.motionQuery.addEventListener('change', this.onMotionChange);
 
       this.resizeObserver = new ResizeObserver(this.onResize);
@@ -253,74 +206,167 @@
       this.resize();
     }
 
-    resolveColors() {
-      const styles = getComputedStyle(document.documentElement);
-      this.colors = Object.fromEntries(Object.entries(this.config.colors).map(([key, token]) => [
-        key,
-        styles.getPropertyValue(token).trim(),
-      ]));
+    getParticleCount() {
+      const settings = this.config.three;
+      if (window.innerWidth <= this.config.breakpoints.mobile) return settings.particleCountMobile;
+      if (window.innerWidth <= this.config.breakpoints.tablet) return settings.particleCountTablet;
+      return settings.particleCountDesktop;
     }
 
-    getDensity() {
-      if (window.innerWidth <= this.config.breakpoints.mobile) return this.config.density.mobile;
-      if (window.innerWidth <= this.config.breakpoints.tablet) return this.config.density.tablet;
-      return this.config.density.desktop;
+    getPointSize() {
+      const settings = this.config.three;
+      if (window.innerWidth <= this.config.breakpoints.mobile) return settings.pointSizeMobile;
+      if (window.innerWidth <= this.config.breakpoints.tablet) return settings.pointSizeTablet;
+      return settings.pointSizeDesktop;
     }
 
-    getSymbolPoint(point) {
-      const size = Math.min(this.width * 0.82, this.height * 0.82);
+    getCloudDepth() {
+      return window.innerWidth <= this.config.breakpoints.mobile
+        ? this.config.three.cloudDepthMobile
+        : this.config.three.cloudDepth;
+    }
+
+    getAmbientAmount() {
+      return window.innerWidth <= this.config.breakpoints.mobile
+        ? this.config.three.ambientAmountMobile
+        : this.config.three.ambientAmount;
+    }
+
+    buildStructuralTargets() {
+      const count = Math.min(
+        this.config.symbol.length,
+        this.config.formation.structuralCap,
+      );
+      return Array.from({ length: count }, (_, index) => {
+        const sourceIndex = Math.round(
+          index * (this.config.symbol.length - 1) / (count - 1),
+        );
+        return this.config.symbol[sourceIndex];
+      });
+    }
+
+    getTargetPosition(index, structuralTargets) {
+      // Si conservano gli stessi tratti esclusi del renderer precedente:
+      // solo un segmento ogni due riceve particelle. Il Varco e il profilo
+      // rimangono quindi volutamente incompleti anche a fine ponte.
+      const activeSegments = [];
+      for (let segment = 0; segment < structuralTargets.length - 1; segment += 2) {
+        activeSegments.push(segment);
+      }
+      const segmentIndex = activeSegments[index % activeSegments.length];
+      const first = structuralTargets[segmentIndex];
+      const second = structuralTargets[segmentIndex + 1];
+      const amount = rangeFromSeed(91001 + index * 47, 0.08, 0.92);
+      const size = this.config.three.targetSize;
+
       return {
-        x: this.width * 0.5 + (point[0] - 0.5) * size,
-        y: this.height * 0.5 + (point[1] - 0.5) * size,
+        x: (lerp(first[0], second[0], amount) - 0.5) * size,
+        y: -(lerp(first[1], second[1], amount) - 0.5) * size,
+        z: rangeFromSeed(
+          92003 + index * 53,
+          -this.config.three.targetDepth,
+          this.config.three.targetDepth,
+        ),
       };
     }
 
-    createScatterPoint(random) {
-      return {
-        x: this.width * lerp(0.07, 0.93, random()),
-        y: this.height * lerp(0.08, 0.92, random()),
-      };
-    }
+    buildParticleBuffers(count) {
+      if (this.points) {
+        this.scene.remove(this.points);
+        this.geometry.dispose();
+      }
 
-    buildParticles() {
-      const random = seededRandom(43721 + Math.round(this.width) * 17 + Math.round(this.height));
-      const count = this.getDensity();
-      const structuralCount = Math.min(this.config.symbol.length, count - 4, this.config.formation.structuralCap);
-      const targets = Array.from({ length: structuralCount }, (_, index) => {
-        const targetIndex = Math.round(index * (this.config.symbol.length - 1) / (structuralCount - 1));
-        return this.config.symbol[targetIndex];
-      });
+      const length = count * 3;
+      this.positions = new Float32Array(length);
+      this.startPositions = new Float32Array(length);
+      this.targetPositions = new Float32Array(length);
+      this.delays = new Float32Array(count);
+      this.durations = new Float32Array(count);
+      this.phases = new Float32Array(count);
 
-      this.particles = Array.from({ length: count }, (_, index) => {
-        const structural = index < structuralCount;
-        return {
-          structural,
-          target: structural ? targets[index] : [lerp(0.30, 0.70, random()), lerp(0.28, 0.72, random())],
-          scatter: this.createScatterPoint(random),
-          size: lerp(this.config.size.nodeMin, this.config.size.nodeMax, random()),
-          phase: random() * Math.PI * 2,
-          shape: index % 4 === 0 ? 'square' : 'circle',
-          x: 0,
-          y: 0,
-        };
-      });
-      this.structuralCount = structuralCount;
-      this.connectionOrder = shuffledOrder(Math.max(0, structuralCount - 1), random);
-      this.temporaryConnections = [];
-      this.lastNetworkUpdate = 0;
+      const settings = this.config.three;
+      const structuralTargets = this.buildStructuralTargets();
+      const cloudDepth = this.getCloudDepth();
+
+      for (let index = 0; index < count; index += 1) {
+        const offset = index * 3;
+        const densityX = rangeFromSeed(11003 + index * 71, 0.56, 1);
+        const densityY = rangeFromSeed(12007 + index * 73, 0.62, 1);
+        const asymmetry = rangeFromSeed(13001 + index * 79, -0.12, 0.18);
+        const startX = (
+          rangeFromSeed(14009 + index * 83, -0.5, 0.5) + asymmetry
+        ) * settings.cloudWidth * densityX;
+        const startY = rangeFromSeed(
+          15013 + index * 89,
+          -0.5,
+          0.5,
+        ) * settings.cloudHeight * densityY;
+        const startZ = rangeFromSeed(
+          16001 + index * 97,
+          -0.5,
+          0.5,
+        ) * cloudDepth;
+        const target = this.getTargetPosition(index, structuralTargets);
+
+        this.startPositions[offset] = startX;
+        this.startPositions[offset + 1] = startY;
+        this.startPositions[offset + 2] = startZ;
+        this.targetPositions[offset] = target.x;
+        this.targetPositions[offset + 1] = target.y;
+        this.targetPositions[offset + 2] = target.z;
+        this.positions[offset] = startX;
+        this.positions[offset + 1] = startY;
+        this.positions[offset + 2] = startZ;
+
+        const delay = rangeFromSeed(
+          17011 + index * 101,
+          settings.delayMin,
+          settings.delayMax,
+        );
+        this.delays[index] = delay;
+        this.durations[index] = Math.min(
+          rangeFromSeed(
+            18013 + index * 103,
+            settings.durationMin,
+            settings.durationMax,
+          ),
+          1 - delay,
+        );
+        this.phases[index] = rangeFromSeed(
+          19001 + index * 107,
+          0,
+          Math.PI * 2,
+        );
+      }
+
+      this.geometry = new THREE.BufferGeometry();
+      const positionAttribute = new THREE.BufferAttribute(this.positions, 3);
+      positionAttribute.setUsage(THREE.DynamicDrawUsage);
+      this.geometry.setAttribute('position', positionAttribute);
+      this.points = new THREE.Points(this.geometry, this.material);
+      this.points.frustumCulled = false;
+      this.scene.add(this.points);
+      this.particleCount = count;
     }
 
     resize() {
       const bounds = this.root.getBoundingClientRect();
       if (bounds.width < 2 || bounds.height < 2) return;
-      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+
       this.width = bounds.width;
       this.height = bounds.height;
-      this.canvas.width = Math.round(bounds.width * ratio);
-      this.canvas.height = Math.round(bounds.height * ratio);
-      this.context.setTransform(ratio, 0, 0, ratio, 0, 0);
-      this.resolveColors();
-      this.buildParticles();
+      this.renderer.setPixelRatio(Math.min(
+        window.devicePixelRatio || 1,
+        this.config.three.pixelRatioMax,
+      ));
+      this.renderer.setSize(bounds.width, bounds.height, false);
+      this.camera.aspect = bounds.width / bounds.height;
+      this.camera.updateProjectionMatrix();
+      this.material.size = this.getPointSize();
+
+      const count = this.getParticleCount();
+      if (count !== this.particleCount) this.buildParticleBuffers(count);
+
       if (this.reducedMotion) this.drawStatic();
       else this.render(performance.now());
     }
@@ -330,182 +376,78 @@
       this.resizeFrame = requestAnimationFrame(() => this.resize());
     }
 
-    getInteractionOffset(x, y) {
-      if (!this.pointer.active || this.reducedMotion) return { x: 0, y: 0 };
-      const dx = x - this.pointer.x;
-      const dy = y - this.pointer.y;
-      const distance = Math.hypot(dx, dy) || 1;
-      if (distance >= this.config.interaction.radius) return { x: 0, y: 0 };
-      const amount = (1 - distance / this.config.interaction.radius) * this.config.interaction.strength;
-      return { x: dx / distance * amount, y: dy / distance * amount };
-    }
-
-    positionParticles(now, staticState = false) {
-      const cohesion = clamp(this.narrative.cohesion, 0, 1);
-      // Il respiro ambientale si riduce man mano che il gruppo si
-      // consolida, ma non si azzera mai del tutto: a scroll fermo il
-      // sistema resta vivo senza però far avanzare la costruzione.
-      const amplitude = staticState
-        ? 0
-        : this.config.motion.amplitude * lerp(1, this.config.formation.ambientKeep, cohesion);
-
-      this.particles.forEach((particle) => {
-        const target = this.getSymbolPoint(particle.target);
-        const driftX = Math.sin(now * this.config.motion.speed + particle.phase) * amplitude;
-        const driftY = Math.cos(now * this.config.motion.speed * 0.83 + particle.phase) * amplitude * 0.7;
-        particle.x = lerp(particle.scatter.x, target.x, cohesion) + driftX;
-        particle.y = lerp(particle.scatter.y, target.y, cohesion) + driftY;
-        const interaction = this.getInteractionOffset(particle.x, particle.y);
-        particle.x += interaction.x;
-        particle.y += interaction.y;
-      });
-    }
-
-    getMaxTemporaryConnections() {
-      const network = this.config.network;
-      if (window.innerWidth <= this.config.breakpoints.mobile) return network.maxConnectionsMobile;
-      if (window.innerWidth <= this.config.breakpoints.tablet) return network.maxConnectionsTablet;
-      return network.maxConnectionsDesktop;
-    }
-
-    updateTemporaryConnections(now, staticState = false) {
-      const network = this.config.network;
-      const maxTotalConnections = this.getMaxTemporaryConnections();
-      const networkFade = 1 - remap01(
-        clamp(this.narrative.p, 0, 1),
-        network.fadeStart,
-        network.fadeEnd,
-      );
-      if (staticState || maxTotalConnections === 0 || networkFade <= 0.01) {
-        this.temporaryConnections = [];
-        return;
-      }
-      if (this.lastNetworkUpdate && now - this.lastNetworkUpdate < network.updateInterval) {
-        return;
-      }
-      this.temporaryConnections = buildTemporaryConnections(
-        this.particles,
-        network.maxDistance,
-        network.maxConnectionsPerParticle,
-        maxTotalConnections,
-      );
-      this.lastNetworkUpdate = now;
-    }
-
-    drawLine(first, second, opacity, width = this.config.connections.lineWidth) {
-      this.context.beginPath();
-      this.context.moveTo(first.x, first.y);
-      this.context.lineTo(second.x, second.y);
-      this.context.strokeStyle = this.colors.connection;
-      this.context.lineWidth = width;
-      this.context.globalAlpha = opacity;
-      this.context.stroke();
-    }
-
-    drawTemporaryConnections(constructionProgress, staticState = false) {
-      if (staticState || !this.temporaryConnections.length) return;
-      const network = this.config.network;
-      const networkFade = 1 - remap01(
+    updatePositions(now, staticState = false) {
+      const settings = this.config.three;
+      const constructionProgress = clamp(this.narrative.p, 0, 1);
+      const formationProgress = remap01(
         constructionProgress,
-        network.fadeStart,
-        network.fadeEnd,
+        settings.formationStart,
+        settings.formationEnd,
       );
-      this.temporaryConnections.forEach((connection) => {
-        const distance = Math.sqrt(connection.distanceSquared);
-        const distanceAlpha = 1 - clamp01(distance / network.maxDistance);
-        const alpha = network.baseAlpha * distanceAlpha * networkFade;
-        if (alpha <= 0.01) return;
-        const first = this.particles[connection.a];
-        const second = this.particles[connection.b];
-        this.drawLine(first, second, alpha, network.lineWidth);
-      });
-    }
+      const ambientBase = staticState ? 0 : this.getAmbientAmount();
 
-    drawStructureConnections(structureProgress) {
-      const nodes = this.particles.slice(0, this.structuralCount);
-      const order = this.connectionOrder || [];
-      for (let index = 0; index < nodes.length - 1; index += 1) {
-        // Un tratto ogni due resta sempre escluso, distribuito lungo tutto
-        // il profilo: garantisce che non si formi mai un contorno continuo,
-        // a prescindere da quanto la struttura si avvicini al suo tetto.
-        if (index % 2 === 1) continue;
-        const rank = order[index] !== undefined ? order[index] : index;
-        const stagger = clamp(structureProgress * (nodes.length + 4) - rank, 0, 1);
-        if (stagger <= 0) continue;
-        this.drawLine(
-          nodes[index],
-          nodes[index + 1],
-          this.config.connections.opacity * stagger,
+      for (let index = 0; index < this.particleCount; index += 1) {
+        const offset = index * 3;
+        const localProgress = clamp01(
+          (formationProgress - this.delays[index]) / this.durations[index],
         );
+        const easedProgress = smoothstep01(localProgress);
+        // Ogni fotogramma parte da sorgente e destinazione immutabili:
+        // nessun drift si accumula nel tempo.
+        const baseX = THREE.MathUtils.lerp(
+          this.startPositions[offset],
+          this.targetPositions[offset],
+          easedProgress,
+        );
+        const baseY = THREE.MathUtils.lerp(
+          this.startPositions[offset + 1],
+          this.targetPositions[offset + 1],
+          easedProgress,
+        );
+        const baseZ = THREE.MathUtils.lerp(
+          this.startPositions[offset + 2],
+          this.targetPositions[offset + 2],
+          easedProgress,
+        );
+        const settleAmount = ambientBase * (0.06 + 0.94 * (1 - easedProgress));
+        const phase = this.phases[index];
+
+        this.positions[offset] = baseX
+          + Math.sin(now * 0.00024 + phase) * settleAmount;
+        this.positions[offset + 1] = baseY
+          + Math.cos(now * 0.00019 + phase * 1.13) * settleAmount * 0.72;
+        this.positions[offset + 2] = baseZ
+          + Math.sin(now * 0.00017 + phase * 0.81) * settleAmount * 0.9;
       }
-    }
 
-    drawParticles(structureProgress) {
-      this.particles.forEach((particle) => {
-        const existingAlpha = particle.structural
-          ? lerp(0.46, this.config.opacity.particle, structureProgress)
-          : this.config.opacity.ambient;
-        this.context.globalAlpha = existingAlpha;
-        this.context.fillStyle = particle.structural ? this.colors.node : this.colors.muted;
-        this.context.beginPath();
-        if (particle.shape === 'square') {
-          this.context.rect(particle.x - particle.size, particle.y - particle.size, particle.size * 2, particle.size * 2);
-        } else {
-          this.context.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        }
-        this.context.fill();
-      });
-    }
-
-    drawGoldElement(now) {
-      // L'oro accompagna il consolidamento a metà del ponte: appare mentre
-      // il gruppo attraversa, si attenua quando l'ordine si assesta e non
-      // occupa mai la posizione finale del Varco — orbita sempre a distanza
-      // minima da quel punto, con opacità mai piena.
-      const level = clamp(this.narrative.gold, 0, 1);
-      if (level <= 0.02) return;
-      const opacity = level * this.config.formation.goldPeakOpacity;
-
-      const target = this.getSymbolPoint(this.config.gold);
-      const symbolSize = Math.min(this.width * 0.82, this.height * 0.82);
-      const size = clamp(symbolSize * 0.045, this.config.size.goldMin, this.config.size.goldMax);
-      const orbitRadius = symbolSize * this.config.formation.goldOrbit;
-      const angle = now * 0.00045;
-      const x = target.x + Math.cos(angle) * orbitRadius;
-      const y = target.y + Math.sin(angle) * orbitRadius;
-
-      this.context.save();
-      this.context.globalAlpha = opacity;
-      this.context.fillStyle = this.colors.accent;
-      this.context.shadowColor = this.colors.accent;
-      this.context.shadowBlur = 8 * this.config.opacity.glow;
-      this.context.fillRect(x - size / 2, y - size / 2, size, size);
-      this.context.restore();
+      this.geometry.attributes.position.needsUpdate = true;
+      return formationProgress;
     }
 
     render(now, staticState = false) {
-      this.context.clearRect(0, 0, this.width, this.height);
-      this.positionParticles(now, staticState);
-      const constructionProgress = clamp(this.narrative.p, 0, 1);
-      const structureProgress = clamp(this.narrative.structure, 0, 1);
-      this.updateTemporaryConnections(now, staticState);
-      this.drawTemporaryConnections(constructionProgress, staticState);
-      this.drawStructureConnections(structureProgress);
-      this.drawParticles(structureProgress);
-      this.drawGoldElement(now);
-      this.context.globalAlpha = 1;
+      if (!this.geometry || !this.particleCount) return;
+      const formationProgress = this.updatePositions(now, staticState);
+      const cloudFactor = staticState ? 0 : 1 - formationProgress;
+      this.camera.position.x = Math.sin(now * 0.00012)
+        * this.config.three.cameraDriftX
+        * cloudFactor;
+      this.camera.position.y = Math.cos(now * 0.0001)
+        * this.config.three.cameraDriftY
+        * cloudFactor;
+      this.camera.position.z = this.config.three.cameraZ;
+      this.camera.lookAt(0, 0, 0);
+      this.renderer.render(this.scene, this.camera);
     }
 
     drawStatic() {
-      if (!this.width || !this.height || !this.particles.length) return;
-      // Reduced motion mantiene la Hero come materia statica. La struttura
-      // incompleta di Esigenze resta affidata al fallback SVG già presente.
+      if (!this.width || !this.height || !this.particleCount) return;
+      // Reduced motion mantiene la materia immediatamente leggibile e ferma.
       const preset = this.config.formation.reducedPreset;
       this.narrative.p = preset.p;
       this.narrative.cohesion = preset.cohesion;
       this.narrative.structure = preset.structure;
       this.narrative.gold = preset.gold;
-      this.render(performance.now(), true);
+      this.render(0, true);
     }
 
     tick(now) {
@@ -526,22 +468,8 @@
       cancelAnimationFrame(this.frame);
     }
 
-    handlePointerMove(event) {
-      const supportsPointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-      if (!supportsPointer || window.innerWidth <= this.config.breakpoints.tablet || this.reducedMotion) return;
-      const bounds = this.root.getBoundingClientRect();
-      this.pointer.active = true;
-      this.pointer.x = event.clientX - bounds.left;
-      this.pointer.y = event.clientY - bounds.top;
-    }
-
-    handlePointerLeave() {
-      this.pointer.active = false;
-    }
-
     handleMotionChange(event) {
       this.reducedMotion = event.matches;
-      this.pointer.active = false;
       if (this.onMotionModeChange) this.onMotionModeChange(this.reducedMotion);
       if (this.reducedMotion) {
         this.stop();
@@ -556,11 +484,13 @@
       cancelAnimationFrame(this.resizeFrame);
       this.resizeObserver.disconnect();
       this.visibilityObserver.disconnect();
-      this.temporaryConnections = [];
-      document.removeEventListener('pointermove', this.onPointerMove);
-      document.removeEventListener('pointerleave', this.onPointerLeave);
       this.motionQuery.removeEventListener('change', this.onMotionChange);
-      this.context.clearRect(0, 0, this.width, this.height);
+      if (this.points) this.scene.remove(this.points);
+      if (this.geometry) this.geometry.dispose();
+      this.material.dispose();
+      this.renderer.dispose();
+      this.points = null;
+      this.geometry = null;
     }
   }
 
