@@ -135,6 +135,10 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
 .hero-visual {
   position: relative; width: 100%; min-height: 410px; aspect-ratio: 1.12;
   overflow: hidden; contain: layout paint size; isolation: isolate;
+  /* Il gruppo attraversa la pagina via transform (ponte Hero → Esigenze):
+     resta sotto testi e card (z-index negativo) e non intercetta mai
+     puntatore, selezione o click lungo il percorso. */
+  pointer-events: none; z-index: -1;
 }
 .hero-structure-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
 
@@ -386,20 +390,20 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
 
 /* ===== Manifesto ===== */
 .manifesto { position: relative; overflow: hidden; padding: 132px 0 124px; background: var(--ink); color: var(--paper); }
-.manifesto-inner { position: relative; min-height: 630px; }
+.manifesto-inner { position: relative; min-height: 540px; }
 .manifesto-eyebrow { margin-bottom: 54px; color: var(--gold); }
 .manifesto-statement { position: relative; z-index: 2; margin: 0; font-size: clamp(54px, 6.4vw, 92px); font-weight: 600; letter-spacing: -.055em; line-height: .98; }
 .manifesto-statement-primary,
 .manifesto-statement-secondary { display: block; text-wrap: balance; }
 .manifesto-statement-primary { max-width: 1010px; color: var(--paper); }
-.manifesto-statement-secondary { max-width: 1060px; margin: 112px 0 0 auto; color: var(--white); text-align: right; }
+.manifesto-statement-secondary { max-width: 1060px; margin: 72px 0 0 auto; color: var(--white); text-align: right; }
 .manifesto-fragment { display: inline-block; }
 .manifesto-solution { position: relative; color: var(--line-strong); }
 .manifesto-strike { position: absolute; top: 54%; right: -2%; left: -2%; height: 2px; transform-origin: left center; background: var(--gold); }
 .manifesto-trigger { position: absolute; z-index: 3; top: 44%; left: 3%; width: min(72vw, 930px); height: 28px; pointer-events: none; }
 .manifesto-trigger-line { position: absolute; top: 13px; right: 0; left: 0; height: 1px; transform-origin: left center; background: var(--gold); opacity: .42; }
 .manifesto-mark { position: absolute; top: 2px; left: 0; width: 24px; height: 24px; transform: translate3d(calc(min(72vw, 930px) - 24px), 0, 0); border-radius: 2px; background: var(--gold); }
-.manifesto-copy { position: relative; z-index: 2; max-width: 590px; margin: 66px 0 0 46%; color: var(--line-strong); font-size: 17px; line-height: 1.72; }
+.manifesto-copy { position: relative; z-index: 2; max-width: 590px; margin: 52px 0 0 46%; color: var(--line-strong); font-size: 17px; line-height: 1.72; }
 
 .manifesto-motion-ready .manifesto-eyebrow { opacity: 0; transform: translateY(10px); }
 .manifesto-motion-ready .manifesto-fragment-a { opacity: .66; transform: translate3d(-18px, 8px, 0); filter: blur(1px); }
@@ -552,9 +556,9 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
   .process-branch { left: 38%; width: 62%; }
   .es-system { grid-template-columns: minmax(200px, .85fr) 210px minmax(250px, 1fr); gap: 30px 44px; }
   .manifesto { padding: 112px 0 108px; }
-  .manifesto-inner { min-height: 590px; }
+  .manifesto-inner { min-height: 460px; }
   .manifesto-statement { font-size: clamp(50px, 6.7vw, 76px); }
-  .manifesto-statement-secondary { max-width: 900px; margin-top: 100px; }
+  .manifesto-statement-secondary { max-width: 900px; margin-top: 64px; }
   .case-card { grid-template-columns: 1fr; }
   .project { grid-template-columns: 1fr; }
   .project-header { border-right: 0; border-bottom: 1px solid var(--line-strong); }
@@ -577,15 +581,15 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
   .es-node-entry { grid-row: 2; }
   .es-node-control { grid-row: 3; }
   .es-node-clients { grid-row: 4; }
-  .manifesto-inner { min-height: 560px; }
+  .manifesto-inner { min-height: 440px; }
   .manifesto-eyebrow { margin-bottom: 44px; }
   .manifesto-statement { font-size: clamp(46px, 7.8vw, 64px); line-height: 1.02; }
   .manifesto-statement-primary { max-width: 720px; }
-  .manifesto-statement-secondary { max-width: 720px; margin-top: 92px; }
+  .manifesto-statement-secondary { max-width: 720px; margin-top: 60px; }
   .manifesto-trigger { top: 43%; left: 0; width: min(78vw, 670px); }
   .manifesto-mark { transform: translate3d(calc(min(78vw, 670px) - 24px), 0, 0); }
   .manifesto-motion-ready.is-active .manifesto-mark { transform: translate3d(calc(min(78vw, 670px) - 24px), 0, 0) scale(1); }
-  .manifesto-copy { max-width: 540px; margin: 58px 0 0 auto; }
+  .manifesto-copy { max-width: 540px; margin: 44px 0 0 auto; }
   .process-title { max-width: 720px; }
   .process-intro { max-width: 650px; }
   .process-visual { margin-top: 64px; }
