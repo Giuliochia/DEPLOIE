@@ -22,9 +22,9 @@ import * as THREE from './vendor/three/three.module.min.js';
       reducedPreset: Object.freeze({ p: 0, cohesion: 0.08, structure: 0.05, gold: 0 }),
     }),
     three: Object.freeze({
-      particleCountDesktop: 72,
-      particleCountTablet: 54,
-      particleCountMobile: 36,
+      particleCountDesktop: 216,
+      particleCountTablet: 144,
+      particleCountMobile: 84,
       cloudWidth: 420,
       cloudHeight: 300,
       cloudDepth: 520,
@@ -36,21 +36,28 @@ import * as THREE from './vendor/three/three.module.min.js';
       pointSizeDesktop: 3.2,
       pointSizeTablet: 3,
       pointSizeMobile: 3.4,
+      formedPointSizeDesktop: 4.4,
+      formedPointSizeTablet: 4,
+      formedPointSizeMobile: 4.2,
       formationStart: 0.08,
       formationEnd: 0.78,
       delayMin: 0,
       delayMax: 0.38,
       durationMin: 0.34,
       durationMax: 0.68,
-      targetDepth: 8,
-      targetSize: 280,
+      targetDepth: 2,
+      targetSize: 378,
+      targetSampleInset: 0.03,
       ambientAmount: 5,
       ambientAmountMobile: 3.2,
+      settledAmbientKeep: 0.01,
       cameraDriftX: 7,
       cameraDriftY: 4,
-      opacity: 0.82,
+      unformedOpacity: 0.62,
+      formedOpacity: 0.96,
       pixelRatioMax: 2,
-      color: '--visual-node',
+      unformedColor: '--visual-node-muted',
+      formedColor: '--visual-node',
     }),
     // Ordered points follow the centre line of the original DEPLOIE symbol,
     // preserving its rounded proportions and the opening at the bottom.
@@ -144,6 +151,7 @@ import * as THREE from './vendor/three/three.module.min.js';
       this.height = 0;
       this.particleCount = 0;
       this.positions = null;
+      this.colors = null;
       this.startPositions = null;
       this.targetPositions = null;
       this.delays = null;
@@ -179,14 +187,18 @@ import * as THREE from './vendor/three/three.module.min.js';
       this.renderer.setClearColor(0x000000, 0);
 
       const styles = getComputedStyle(document.documentElement);
-      const neutralColor = styles.getPropertyValue(config.three.color).trim();
+      const unformedColor = styles.getPropertyValue(config.three.unformedColor).trim();
+      const formedColor = styles.getPropertyValue(config.three.formedColor).trim();
+      this.unformedColor = new THREE.Color(unformedColor || '#77756F');
+      this.formedColor = new THREE.Color(formedColor || '#1E1E1B');
       this.material = new THREE.PointsMaterial({
-        color: new THREE.Color(neutralColor || '#1E1E1B'),
-        opacity: config.three.opacity,
+        color: 0xffffff,
+        opacity: config.three.unformedOpacity,
         transparent: true,
         size: config.three.pointSizeDesktop,
         sizeAttenuation: true,
         depthWrite: false,
+        vertexColors: true,
       });
 
       this.onMotionChange = this.handleMotionChange.bind(this);
@@ -218,6 +230,13 @@ import * as THREE from './vendor/three/three.module.min.js';
       if (window.innerWidth <= this.config.breakpoints.mobile) return settings.pointSizeMobile;
       if (window.innerWidth <= this.config.breakpoints.tablet) return settings.pointSizeTablet;
       return settings.pointSizeDesktop;
+    }
+
+    getFormedPointSize() {
+      const settings = this.config.three;
+      if (window.innerWidth <= this.config.breakpoints.mobile) return settings.formedPointSizeMobile;
+      if (window.innerWidth <= this.config.breakpoints.tablet) return settings.formedPointSizeTablet;
+      return settings.formedPointSizeDesktop;
     }
 
     getCloudDepth() {
@@ -256,7 +275,11 @@ import * as THREE from './vendor/three/three.module.min.js';
       const segmentIndex = activeSegments[index % activeSegments.length];
       const first = structuralTargets[segmentIndex];
       const second = structuralTargets[segmentIndex + 1];
-      const amount = rangeFromSeed(91001 + index * 47, 0.08, 0.92);
+      const amount = rangeFromSeed(
+        91001 + index * 47,
+        this.config.three.targetSampleInset,
+        1 - this.config.three.targetSampleInset,
+      );
       const size = this.config.three.targetSize;
 
       return {
@@ -278,6 +301,7 @@ import * as THREE from './vendor/three/three.module.min.js';
 
       const length = count * 3;
       this.positions = new Float32Array(length);
+      this.colors = new Float32Array(length);
       this.startPositions = new Float32Array(length);
       this.targetPositions = new Float32Array(length);
       this.delays = new Float32Array(count);
@@ -317,6 +341,9 @@ import * as THREE from './vendor/three/three.module.min.js';
         this.positions[offset] = startX;
         this.positions[offset + 1] = startY;
         this.positions[offset + 2] = startZ;
+        this.colors[offset] = this.unformedColor.r;
+        this.colors[offset + 1] = this.unformedColor.g;
+        this.colors[offset + 2] = this.unformedColor.b;
 
         const delay = rangeFromSeed(
           17011 + index * 101,
@@ -343,6 +370,9 @@ import * as THREE from './vendor/three/three.module.min.js';
       const positionAttribute = new THREE.BufferAttribute(this.positions, 3);
       positionAttribute.setUsage(THREE.DynamicDrawUsage);
       this.geometry.setAttribute('position', positionAttribute);
+      const colorAttribute = new THREE.BufferAttribute(this.colors, 3);
+      colorAttribute.setUsage(THREE.DynamicDrawUsage);
+      this.geometry.setAttribute('color', colorAttribute);
       this.points = new THREE.Points(this.geometry, this.material);
       this.points.frustumCulled = false;
       this.scene.add(this.points);
@@ -409,7 +439,10 @@ import * as THREE from './vendor/three/three.module.min.js';
           this.targetPositions[offset + 2],
           easedProgress,
         );
-        const settleAmount = ambientBase * (0.06 + 0.94 * (1 - easedProgress));
+        const settleAmount = ambientBase * (
+          settings.settledAmbientKeep
+          + (1 - settings.settledAmbientKeep) * (1 - easedProgress)
+        );
         const phase = this.phases[index];
 
         this.positions[offset] = baseX
@@ -418,9 +451,36 @@ import * as THREE from './vendor/three/three.module.min.js';
           + Math.cos(now * 0.00019 + phase * 1.13) * settleAmount * 0.72;
         this.positions[offset + 2] = baseZ
           + Math.sin(now * 0.00017 + phase * 0.81) * settleAmount * 0.9;
+        this.colors[offset] = THREE.MathUtils.lerp(
+          this.unformedColor.r,
+          this.formedColor.r,
+          easedProgress,
+        );
+        this.colors[offset + 1] = THREE.MathUtils.lerp(
+          this.unformedColor.g,
+          this.formedColor.g,
+          easedProgress,
+        );
+        this.colors[offset + 2] = THREE.MathUtils.lerp(
+          this.unformedColor.b,
+          this.formedColor.b,
+          easedProgress,
+        );
       }
 
       this.geometry.attributes.position.needsUpdate = true;
+      this.geometry.attributes.color.needsUpdate = true;
+      const presenceProgress = smoothstep01(formationProgress);
+      this.material.opacity = lerp(
+        settings.unformedOpacity,
+        settings.formedOpacity,
+        presenceProgress,
+      );
+      this.material.size = lerp(
+        this.getPointSize(),
+        this.getFormedPointSize(),
+        presenceProgress,
+      );
       return formationProgress;
     }
 
