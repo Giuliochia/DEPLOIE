@@ -440,7 +440,83 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
 .progetti { padding: 100px 0; background: var(--paper); }
 .progetti-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; flex-wrap: wrap; margin-bottom: 48px; }
 .progetti-head h2 { font-size: clamp(26px, 2.8vw, 34px); font-weight: 600; letter-spacing: -.02em; max-width: 560px; line-height: 1.18; }
-.projects-list { display: grid; gap: 40px; }
+.projects-list { display: grid; gap: 40px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+
+.project-tile {
+  --tile-d: 550ms;
+  --tile-e: cubic-bezier(.19,1,.22,1);
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  min-height: 380px;
+  padding: 28px;
+  border-radius: 8px;
+  color: var(--white);
+  text-decoration: none;
+  box-shadow: 0 20px 40px -20px rgba(30,30,27,.35);
+}
+.project-tile-media {
+  position: absolute;
+  inset: -5% 0 0 0;
+  height: 110%;
+  background-size: cover;
+  background-position: center;
+  transition: transform calc(var(--tile-d) * 1.5) var(--tile-e);
+  pointer-events: none;
+}
+.project-tile-media--placeholder {
+  background-image: repeating-linear-gradient(135deg, var(--line) 0 13px, var(--paper) 13px 26px);
+}
+.project-tile:before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  height: 200%;
+  pointer-events: none;
+  background-image: linear-gradient(to bottom, rgba(30,30,27,0) 0%, rgba(30,30,27,.75) 100%);
+  transform: translateY(-50%);
+  transition: transform calc(var(--tile-d) * 2) var(--tile-e);
+}
+.project-tile-content { position: relative; z-index: 1; width: 100%; transition: transform var(--tile-d) var(--tile-e); }
+.project-tile-type { font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+.project-tile-title { font-size: 22px; font-weight: 600; line-height: 1.24; letter-spacing: -.01em; }
+.project-tile-desc { margin-top: 14px; font-size: 15px; line-height: 1.55; color: rgba(255,255,255,.85); }
+.project-tile-facts { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+.project-tile-facts > div { display: grid; grid-template-columns: 72px 1fr; gap: 12px; }
+.project-tile-facts dt { font-family: ui-monospace, monospace; font-size: 10px; color: rgba(255,255,255,.6); padding-top: 2px; }
+.project-tile-facts dd { font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.85); }
+.project-tile-link { display: inline-block; margin-top: 18px; font-size: 13px; font-weight: 600; color: var(--gold); }
+
+@media (hover: hover) and (min-width: 640px) {
+  .project-tile:before { transform: translateY(0); }
+  .project-tile-content { transform: translateY(calc(100% - 4.6rem)); }
+  .project-tile-content > *:not(.project-tile-title) {
+    opacity: 0;
+    transform: translateY(.8rem);
+    transition: transform var(--tile-d) var(--tile-e), opacity var(--tile-d) var(--tile-e);
+  }
+  .project-tile:hover,
+  .project-tile:focus-within { align-items: center; }
+  .project-tile:hover .project-tile-media,
+  .project-tile:focus-within .project-tile-media { transform: translateY(-3%); }
+  .project-tile:hover:before,
+  .project-tile:focus-within:before { transform: translateY(-50%); }
+  .project-tile:hover .project-tile-content,
+  .project-tile:focus-within .project-tile-content { transform: translateY(0); }
+  .project-tile:hover .project-tile-content > *:not(.project-tile-title),
+  .project-tile:focus-within .project-tile-content > *:not(.project-tile-title) {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: calc(var(--tile-d) / 8);
+  }
+  .project-tile:focus-within:before,
+  .project-tile:focus-within .project-tile-media,
+  .project-tile:focus-within .project-tile-content,
+  .project-tile:focus-within .project-tile-content > *:not(.project-tile-title) {
+    transition-duration: 0s;
+  }
+}
 .project { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); background: var(--white); border: 1px solid var(--line-strong); }
 .project-header { padding: 40px; border-right: 1px solid var(--line-strong); }
 .project-meta { display: flex; gap: 10px 20px; flex-wrap: wrap; margin-bottom: 20px; }
