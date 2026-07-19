@@ -45,18 +45,71 @@
     revealEls.forEach((el) => el.classList.add('in-view'));
   }
 
-  // --- Manifesto: one narrative sequence on first entry ---
+  // --- Manifesto: one narrative sequence, repeated only while visible ---
   const manifesto = document.querySelector('[data-manifesto]');
   if (manifesto && !prefersReducedMotion && 'IntersectionObserver' in window) {
+    const manifestoCycleDuration = 20000;
+    const manifestoResetDuration = 500;
+    let manifestoIsVisible = false;
+    let manifestoHasActivated = false;
+    let manifestoLoopRunning = false;
+    let manifestoResetTimer = 0;
+    let manifestoRestartTimer = 0;
+    let manifestoRestartFrame = 0;
+
+    const clearManifestoLoop = () => {
+      window.clearTimeout(manifestoResetTimer);
+      window.clearTimeout(manifestoRestartTimer);
+      cancelAnimationFrame(manifestoRestartFrame);
+      manifestoResetTimer = 0;
+      manifestoRestartTimer = 0;
+      manifestoRestartFrame = 0;
+    };
+
+    const scheduleManifestoCycle = () => {
+      manifestoResetTimer = window.setTimeout(() => {
+        if (!manifestoIsVisible) return;
+        manifesto.classList.add('is-resetting');
+
+        manifestoRestartTimer = window.setTimeout(() => {
+          if (!manifestoIsVisible) return;
+          manifesto.classList.remove('is-active');
+          void manifesto.offsetWidth;
+          manifestoRestartFrame = requestAnimationFrame(() => {
+            if (!manifestoIsVisible) return;
+            manifesto.classList.add('is-active');
+            manifesto.classList.remove('is-resetting');
+            scheduleManifestoCycle();
+          });
+        }, manifestoResetDuration);
+      }, manifestoCycleDuration - manifestoResetDuration);
+    };
+
+    const startManifestoLoop = () => {
+      if (manifestoLoopRunning || !manifestoIsVisible || !manifestoHasActivated) return;
+      manifestoLoopRunning = true;
+      scheduleManifestoCycle();
+    };
+
+    const stopManifestoLoop = () => {
+      manifestoLoopRunning = false;
+      clearManifestoLoop();
+      manifesto.classList.remove('is-resetting');
+      if (manifestoHasActivated) manifesto.classList.add('is-active');
+    };
+
     manifesto.classList.add('manifesto-motion-ready');
     const manifestoObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
+        manifestoIsVisible = entry.isIntersecting;
+        if (entry.intersectionRatio >= 0.28 && !manifestoHasActivated) {
+          manifestoHasActivated = true;
           entry.target.classList.add('is-active');
-          manifestoObserver.unobserve(entry.target);
         }
+        if (manifestoIsVisible) startManifestoLoop();
+        else stopManifestoLoop();
       });
-    }, { threshold: 0.28, rootMargin: '0px 0px -50px 0px' });
+    }, { threshold: [0, 0.28], rootMargin: '0px 0px -50px 0px' });
     manifestoObserver.observe(manifesto);
   }
 

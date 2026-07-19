@@ -387,6 +387,7 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
 .manifesto-statement-secondary { display: block; text-wrap: balance; }
 .manifesto-statement-primary { max-width: 1010px; color: var(--paper); }
 .manifesto-statement-secondary { max-width: 1060px; margin: 112px 0 0 auto; color: var(--white); text-align: right; }
+.manifesto-accent { color: var(--gold); }
 .manifesto-fragment { display: inline-block; }
 .manifesto-solution { position: relative; color: var(--line-strong); }
 .manifesto-strike { position: absolute; top: 54%; right: -2%; left: -2%; height: 2px; transform-origin: left center; background: var(--gold); }
@@ -401,6 +402,7 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
 .manifesto-motion-ready .manifesto-solution { opacity: .9; transform: translate3d(15px, 5px, 0); filter: blur(.7px); }
 .manifesto-motion-ready .manifesto-strike { transform: scaleX(0); }
 .manifesto-motion-ready .manifesto-statement-secondary { opacity: 0; transform: translate3d(24px, 18px, 0); }
+.manifesto-motion-ready .manifesto-accent { color: var(--white); }
 .manifesto-motion-ready .manifesto-copy { opacity: 0; transform: translateY(14px); }
 .manifesto-motion-ready .manifesto-trigger-line { transform: scaleX(0); }
 .manifesto-motion-ready .manifesto-mark { opacity: 0; transform: translate3d(0, 0, 0) scale(.8); }
@@ -411,9 +413,18 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
 .manifesto-motion-ready.is-active .manifesto-solution { opacity: .68; transition-delay: .38s; }
 .manifesto-motion-ready.is-active .manifesto-strike { transform: scaleX(1); transition: transform .55s var(--ease) .92s; }
 .manifesto-motion-ready.is-active .manifesto-trigger-line { transform: scaleX(1); transition: transform 1.05s var(--ease) .72s; }
-.manifesto-motion-ready.is-active .manifesto-mark { opacity: 1; transform: translate3d(calc(min(72vw, 930px) - 24px), 0, 0) scale(1); transition: opacity .2s var(--ease) .68s, transform 1.25s var(--ease) .68s; }
+.manifesto-motion-ready.is-active .manifesto-mark { opacity: 1; transform: translate3d(calc(min(72vw, 930px) - 24px), 0, 0) scale(1); transition: opacity .2s var(--ease) 1.05s, transform 1.25s var(--ease) 1.05s; }
 .manifesto-motion-ready.is-active .manifesto-statement-secondary { opacity: 1; transform: translate3d(0, 0, 0); transition: opacity .65s var(--ease) 1.3s, transform .75s var(--ease) 1.3s; }
+.manifesto-motion-ready.is-active .manifesto-accent { color: var(--gold); transition: color .55s var(--ease) 2.05s; }
 .manifesto-motion-ready.is-active .manifesto-copy { opacity: 1; transform: translateY(0); transition: opacity .55s var(--ease) 1.9s, transform .65s var(--ease) 1.9s; }
+.manifesto-motion-ready.is-resetting .manifesto-eyebrow,
+.manifesto-motion-ready.is-resetting .manifesto-fragment,
+.manifesto-motion-ready.is-resetting .manifesto-statement-secondary,
+.manifesto-motion-ready.is-resetting .manifesto-copy { opacity: 0; transition: opacity .5s var(--ease); }
+.manifesto-motion-ready.is-resetting .manifesto-strike,
+.manifesto-motion-ready.is-resetting .manifesto-trigger-line { transform: scaleX(0); transition: transform .5s var(--ease); }
+.manifesto-motion-ready.is-resetting .manifesto-mark { opacity: 0; transition: opacity .4s var(--ease); }
+.manifesto-motion-ready.is-resetting .manifesto-accent { color: var(--white); transition: color .45s var(--ease); }
 
 /* ===== Personale ===== */
 .personale { padding: 100px 0; }
@@ -870,8 +881,18 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
   .manifesto-motion-ready .manifesto-statement-secondary,
   .manifesto-motion-ready .manifesto-copy { opacity: 1; transform: none; filter: none; transition: none; }
   .manifesto-motion-ready .manifesto-solution { opacity: 1; }
+  .manifesto-accent,
+  .manifesto-motion-ready .manifesto-accent { color: var(--gold); transition: none; }
   .manifesto-motion-ready .manifesto-strike,
-  .manifesto-motion-ready .manifesto-trigger-line { transform: scaleX(1); transition: none; }
+  .manifesto-motion-ready .manifesto-trigger-line { transform: scaleX(1); transition: none; animation: none; }
+  .manifesto-motion-ready.is-resetting .manifesto-eyebrow,
+  .manifesto-motion-ready.is-resetting .manifesto-fragment,
+  .manifesto-motion-ready.is-resetting .manifesto-statement-secondary,
+  .manifesto-motion-ready.is-resetting .manifesto-copy { opacity: 1; transition: none; }
+  .manifesto-motion-ready.is-resetting .manifesto-strike,
+  .manifesto-motion-ready.is-resetting .manifesto-trigger-line { transform: scaleX(1); transition: none; }
+  .manifesto-motion-ready.is-resetting .manifesto-mark { opacity: 1; transition: none; }
+  .manifesto-motion-ready.is-resetting .manifesto-accent { color: var(--gold); transition: none; }
   .manifesto-motion-ready .manifesto-mark { opacity: 1; transition: none; }
   .process-motion-ready .process-eyebrow,
   .process-motion-ready .process-title,
