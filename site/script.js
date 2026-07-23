@@ -27,12 +27,18 @@
   });
 
   // --- Shared runtime preferences and breakpoints ---
-  const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const sharedMotionQueries = window.DeploieMotion?.queries || {
+    reducedMotion: '(prefers-reduced-motion: reduce)',
+    desktop: '(min-width: 821px)',
+    esigenzeDesktop: '(min-width: 901px)',
+    preciseHover: '(hover: hover) and (pointer: fine)'
+  };
+  const reducedMotionQuery = window.matchMedia(sharedMotionQueries.reducedMotion);
   let prefersReducedMotion = reducedMotionQuery.matches;
   const motionBreakpoints = {
-    processDesktop: window.matchMedia('(min-width: 821px)'),
-    esigenzeDesktop: window.matchMedia('(min-width: 901px)'),
-    preciseHover: window.matchMedia('(hover: hover) and (pointer: fine)')
+    processDesktop: window.matchMedia(sharedMotionQueries.desktop),
+    esigenzeDesktop: window.matchMedia(sharedMotionQueries.esigenzeDesktop),
+    preciseHover: window.matchMedia(sharedMotionQueries.preciseHover)
   };
   const activeObservers = new Set();
 
