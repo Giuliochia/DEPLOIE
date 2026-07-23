@@ -26,10 +26,13 @@
 
 <a class="skip-link" href="#main">Vai al contenuto</a>
 
-<header class="site-header">
+<header class="site-header is-over-hero">
   <div class="wrap header-inner">
     <a href="#top" class="logo-link" aria-label="DEPLOIE — home">
-      <img src="assets/logo-horizontal-color.svg" alt="DEPLOIE" class="logo">
+      <svg class="logo logo-inline" width="201.366" height="42.333" viewBox="0 0 201.366 42.333" aria-hidden="true">
+        <image class="logo-base-image" href="assets/logo-horizontal-color.svg" width="201.366" height="42.333"></image>
+        <rect class="logo-amber-mark" x="18.3" y="34.48" width="5.75" height="5.75" rx=".7"></rect>
+      </svg>
     </a>
     <nav class="nav-desktop" aria-label="Navigazione principale">
       <a href="#cosa-semplificare">Esigenze</a>
@@ -56,13 +59,17 @@
     <div class="wrap hero-inner">
       <div class="hero-copy">
         <h1>
-          <span class="hero-title-reveal">Partiamo dal problema reale</span>
-          <span class="hero-title-reveal">per costruire</span>
-          <span class="hero-title-reveal">uno strumento utile</span>
+          <span class="hero-title-reveal">Non tutte le idee</span>
+          <span class="hero-title-reveal">meritano di diventare</span>
+          <span class="hero-title-reveal">uno strumento.</span>
         </h1>
-        <p class="hero-text">Partiamo dal problema reale, non dalla soluzione immaginata.</p>
+        <p class="hero-text">Capiamo cosa conta davvero, prima di proporre una soluzione.</p>
         <div class="hero-ctas">
           <a href="#contatti" class="btn btn-primary">Raccontaci la tua attività</a>
+          <a class="hero-esigenze-bridge" href="#cosa-semplificare" aria-label="Scorri alla sezione successiva">
+            <small class="hero-scroll-label" aria-hidden="true">Scorri</small>
+            <span aria-hidden="true"></span>
+          </a>
         </div>
       </div>
       <div class="hero-visual">
@@ -71,7 +78,10 @@
           <desc id="hero-diagram-desc">Richieste, problemi e ipotesi vengono analizzati e collegati fino a convergere in un unico strumento utile.</desc>
           <defs>
             <filter id="hero-card-shadow" x="-16%" y="-14%" width="142%" height="148%">
-              <feDropShadow dx="5" dy="9" stdDeviation="7" flood-color="#1e1b16" flood-opacity=".16"></feDropShadow>
+              <feDropShadow dx="4" dy="8" stdDeviation="6" flood-color="#1e1b16" flood-opacity=".35"></feDropShadow>
+            </filter>
+            <filter id="hero-card-shadow-strong" x="-20%" y="-18%" width="150%" height="158%">
+              <feDropShadow dx="5" dy="10" stdDeviation="7" flood-color="#1e1b16" flood-opacity=".46"></feDropShadow>
             </filter>
             <linearGradient id="hero-card-paper" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0" stop-color="#fbf8f1"></stop>
@@ -201,21 +211,23 @@
           </g>
 
           <g class="hero-diagram-connections-out" aria-hidden="true">
-            <path class="hero-diagram-path hero-output-path hero-output-path-structural" pathLength="1" d="M415 310 C555 336 694 430 842 510"></path>
-            <path class="hero-diagram-path hero-output-path hero-output-path-primary" pathLength="1" d="M646 520 C716 520 770 521 842 522"></path>
-            <path class="hero-diagram-path hero-output-path hero-output-path-structural" pathLength="1" d="M401 734 C570 704 716 590 842 530"></path>
-            <path class="hero-diagram-path hero-output-path hero-output-path-structural" pathLength="1" d="M375 920 C556 810 704 648 842 536"></path>
-            <path class="hero-diagram-path hero-output-path hero-output-path-structural" pathLength="1" d="M606 858 C692 727 760 608 842 522"></path>
+            <path class="hero-diagram-path hero-output-path hero-output-path-structural" pathLength="1" d="M415 310 C565 336 710 430 860 510"></path>
+            <path class="hero-diagram-path hero-output-path hero-output-path-primary" pathLength="1" d="M646 520 C724 520 784 521 860 522"></path>
+            <path class="hero-diagram-path hero-output-path hero-output-path-structural" pathLength="1" d="M401 734 C580 704 730 590 860 530"></path>
+            <path class="hero-diagram-path hero-output-path hero-output-path-structural" pathLength="1" d="M375 920 C568 810 720 648 860 536"></path>
+            <path class="hero-diagram-path hero-output-path hero-output-path-structural" pathLength="1" d="M606 858 C704 727 776 608 860 522"></path>
           </g>
 
           <g class="hero-diagram-output">
-            <circle class="hero-convergence-point" cx="842" cy="522" r="6"></circle>
-            <g class="hero-output-node">
-              <rect class="hero-card hero-card-output" x="850" y="424" width="154" height="248" rx="4"></rect>
-              <circle class="hero-card-pin hero-card-pin-output" cx="868" cy="442" r="8"></circle>
-              <text class="hero-card-label hero-card-label-center hero-output-label" x="927" y="501"><tspan x="927">Strumento</tspan><tspan x="927" dy="30">utile</tspan></text>
-              <circle class="hero-output-check-ring" cx="927" cy="584" r="31"></circle>
-              <path class="hero-output-check" pathLength="1" d="M909 584 L922 598 L947 567"></path>
+            <circle class="hero-convergence-point" cx="860" cy="522" r="6"></circle>
+            <g class="hero-output-emphasis" transform="translate(26 0) translate(927 548) scale(1.22) translate(-927 -548)">
+              <g class="hero-output-node">
+                <rect class="hero-card hero-card-output" x="850" y="424" width="154" height="248" rx="4"></rect>
+                <circle class="hero-card-pin hero-card-pin-output" cx="868" cy="442" r="8"></circle>
+                <text class="hero-card-label hero-card-label-center hero-output-label" x="927" y="501"><tspan x="927">Strumento</tspan><tspan x="927" dy="30">utile</tspan></text>
+                <circle class="hero-output-check-ring" cx="927" cy="584" r="31"></circle>
+                <path class="hero-output-check" pathLength="1" d="M909 584 L922 598 L947 567"></path>
+              </g>
             </g>
           </g>
         </svg>
@@ -224,7 +236,6 @@
   </section>
 
   <section id="cosa-semplificare" class="esigenze">
-    <span class="hero-esigenze-bridge" aria-hidden="true"><span></span></span>
     <div class="wrap">
       <div class="esigenze-head">
         <p class="eyebrow">Cosa possiamo semplificare</p>

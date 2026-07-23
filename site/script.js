@@ -47,6 +47,18 @@
     return observer;
   };
 
+  const siteHeader = document.querySelector('.site-header');
+  const heroSection = document.getElementById('top');
+  if (siteHeader && heroSection && 'IntersectionObserver' in window) {
+    const headerHeroObserver = trackObserver(new IntersectionObserver(([entry]) => {
+      siteHeader.classList.toggle('is-over-hero', entry.isIntersecting);
+    }, {
+      threshold: 0,
+      rootMargin: `-${siteHeader.offsetHeight}px 0px 0px`
+    }));
+    headerHeroObserver.observe(heroSection);
+  }
+
   const disconnectObservers = () => {
     activeObservers.forEach((observer) => observer.disconnect());
     activeObservers.clear();

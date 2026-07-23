@@ -203,23 +203,23 @@
     ];
     const finalEmptyStates = compactFinal
       ? [[-14, 8, -0.4], [16, -8, 0.45], [18, 9, -0.35], [-12, 12, 0.3], [14, 8, -0.4], [17, 10, 0.35], [-10, 13, -0.3], [12, 12, 0.4]]
-      : [[-184, 54, -2.8], [280, 30, 3.1], [232, 212, -2.5], [105, 94, 2.3], [98, 122, -2.7], [246, 6, 3.2], [-34, 106, -2.2], [126, 58, 2.6]];
+      : [[-250, 42, -2.8], [330, 16, 3.1], [300, 198, -2.5], [-8, 108, 2.3], [-22, 136, -2.7], [314, -4, 3.2], [-126, 94, -2.2], [214, 66, 2.6]];
     Array.from(hero.querySelectorAll('.hero-card-back')).forEach((card, index) => {
       const [x, y, rotation] = finalEmptyStates[index];
       gsap.set(card, {
         x,
         y,
         rotation,
-        fillOpacity: 0.065,
-        strokeOpacity: 0.4,
+        fillOpacity: 0.12,
+        strokeOpacity: 0.5,
         filter: 'none'
       });
     });
     gsap.set(hero.querySelector('.hero-diagram-output'), { opacity: 1 });
     const finalInputNodes = Array.from(hero.querySelectorAll('.hero-input-node'));
     const unusedOffsets = compactFinal
-      ? [[11.2, -12.8, -0.62], [-10.24, 15.36, -0.7], [-4.48, 6.08, 0.57]]
-      : [[70, -80, -2.8], [-64, 96, -3.2], [-28, 38, 2.6]];
+      ? [[27.84, -14.72, -0.62], [-28.16, 13.12, -0.7], [-18.88, 8.64, 0.57]]
+      : [[174, -92, -2.8], [-176, 82, -3.2], [-118, 54, 2.6]];
     finalInputNodes.forEach((node, index) => {
       const card = node.querySelector('.hero-card');
       const content = Array.from(node.children).filter((child) => child !== card);
@@ -255,9 +255,9 @@
     });
     gsap.set(hero.querySelector('.hero-node-redundant'), {
       opacity: 0.12,
-      x: compactFinal ? 43.52 : 272,
-      y: compactFinal ? -10.24 : -64,
-      rotation: compactFinal ? -0.77 : -3.5,
+      x: compactFinal ? 55.68 : 348,
+      y: compactFinal ? -6.72 : -42,
+      rotation: compactFinal ? -0.66 : -3,
       scale: 0.97,
       clearProps: 'willChange'
     });
@@ -379,7 +379,7 @@
       'hero-node-clients': { x: 0, y: 0, rotation: 0 },
       'hero-node-automation': { x: 438, y: -232, rotation: -3.3 },
       'hero-node-booking': { x: 190, y: 28, rotation: 2.4 },
-      'hero-node-redundant': { x: 348, y: -42, rotation: -3.5 }
+      'hero-node-redundant': { x: 348, y: -42, rotation: -3 }
     });
     const compactScatterRatio = compact ? 0.16 : 1;
     const compactRotationRatio = compact ? 0.22 : 1;
@@ -476,8 +476,8 @@
       }
     });
 
-    const titleDurations = [0.76, 0.74, 0.78];
-    const titleStarts = [0, 2.25, 4.43];
+    const titleDurations = [0.5, 0.58, 0.52];
+    const titleStarts = [0, 0.64, 1.36];
     titleBlocks.forEach((block, index) => {
       const start = titleStarts[index];
       const duration = titleDurations[index];
@@ -607,8 +607,8 @@
         scale: 0.97, opacity: 0.12, duration: 0.42, ease: 'power2.out'
       }, 3.5)
       .to(backgroundCards, {
-        fillOpacity: 0.065,
-        strokeOpacity: 0.4,
+        fillOpacity: 0.12,
+        strokeOpacity: 0.5,
         duration: 0.42,
         ease: 'power2.out'
       }, 3.42)
@@ -646,11 +646,39 @@
         yoyo: true,
         repeat: 1
       }, 5.24)
+      .set(outputNode, {
+        transformOrigin: '18px 18px'
+      }, 5.4)
+      .to(outputNode, {
+        rotation: 5,
+        duration: 0.28,
+        ease: 'power2.out'
+      }, 5.4)
+      .to(outputNode, {
+        rotation: -3,
+        duration: 0.48,
+        ease: 'power2.inOut'
+      }, 5.68)
+      .to(outputNode, {
+        rotation: 2,
+        duration: 0.5,
+        ease: 'power2.inOut'
+      }, 6.16)
+      .to(outputNode, {
+        rotation: -1,
+        duration: 0.52,
+        ease: 'power2.inOut'
+      }, 6.66)
+      .to(outputNode, {
+        rotation: 0,
+        duration: 0.58,
+        ease: 'power2.out'
+      }, 7.18)
       .to(bridge, { scaleY: 1, duration: 0.22 }, 4.98)
       .to(bridgeMark, { scale: 1, duration: 0.1 }, 5.1)
 
       // Pausa di lettura, senza nuove azioni visive.
-      .to(quietHold, { progress: 1, duration: 0.7, ease: 'none' }, 5.4);
+      .to(quietHold, { progress: 1, duration: 0.7, ease: 'none' }, 7.76);
 
     return timeline;
   };
