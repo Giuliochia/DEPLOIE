@@ -95,34 +95,34 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
   border-bottom: 1px solid var(--line);
   transition: background-color .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease);
 }
-.site-header.is-over-hero {
+.site-header.is-header-dark {
   background: rgba(30, 27, 22, .96);
   border-bottom-color: rgba(244, 240, 232, .12);
   color: #F4F0E8;
 }
-.site-header.is-over-hero .logo-base-image { filter: brightness(0) invert(1); }
+.site-header.is-header-dark .logo-base-image { filter: brightness(0) invert(1); }
 .logo-link {
   flex: none;
 }
 .logo-inline { display: block; overflow: visible; }
 .logo-amber-mark { fill: #D9A031; }
-.site-header.is-over-hero .nav-desktop a:not(.btn) { color: #F4F0E8; }
-.site-header.is-over-hero .nav-desktop a:not(.btn):hover { color: var(--gold); }
-.site-header.is-over-hero .btn-outline {
+.site-header.is-header-dark .nav-desktop a:not(.btn) { color: #F4F0E8; }
+.site-header.is-header-dark .nav-desktop a:not(.btn):hover { color: var(--gold); }
+.site-header.is-header-dark .btn-outline {
   border-color: #D9A031;
   color: #F4F0E8;
 }
-.site-header.is-over-hero .btn-outline:hover {
+.site-header.is-header-dark .btn-outline:hover {
   background: #D9A031;
   border-color: #D9A031;
   color: #1E1B16;
 }
-.site-header.is-over-hero .menu-toggle span { background: #F4F0E8; }
-.site-header.is-over-hero .nav-mobile {
+.site-header.is-header-dark .menu-toggle span { background: #F4F0E8; }
+.site-header.is-header-dark .nav-mobile {
   background: #1E1B16;
   border-top-color: rgba(244, 240, 232, .12);
 }
-.site-header.is-over-hero .nav-mobile a {
+.site-header.is-header-dark .nav-mobile a {
   color: #F4F0E8;
   border-bottom-color: rgba(244, 240, 232, .12);
 }
@@ -314,7 +314,7 @@ a:focus-visible, button:focus-visible, textarea:focus-visible {
 }
 
 /* ===== Processo ===== */
-.process-system { padding: 72px 0 80px; background: var(--paper); }
+.process-system { padding: 72px 0 80px; background: var(--white); }
 .process-header { display: grid; gap: 12px; }
 .process-eyebrow { margin-bottom: 0; }
 .process-title { max-width: 980px; font-size: clamp(36px, 3.2vw, 44px); font-weight: 600; letter-spacing: -.04em; line-height: 1.06; text-wrap: balance; }

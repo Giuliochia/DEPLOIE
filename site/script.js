@@ -48,15 +48,23 @@
   };
 
   const siteHeader = document.querySelector('.site-header');
-  const heroSection = document.getElementById('top');
-  if (siteHeader && heroSection && 'IntersectionObserver' in window) {
-    const headerHeroObserver = trackObserver(new IntersectionObserver(([entry]) => {
-      siteHeader.classList.toggle('is-over-hero', entry.isIntersecting);
+  const darkHeaderSections = document.querySelectorAll('[data-header-theme="dark"]');
+  if (siteHeader && darkHeaderSections.length && 'IntersectionObserver' in window) {
+    const activeDarkSections = new Set();
+    const headerBandHeight = siteHeader.getBoundingClientRect().height;
+    const themeProbeHeight = 1;
+    const bottomMargin = Math.max(0, window.innerHeight - headerBandHeight - themeProbeHeight);
+    const headerThemeObserver = trackObserver(new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && entry.intersectionRatio > 0) activeDarkSections.add(entry.target);
+        else activeDarkSections.delete(entry.target);
+      });
+      siteHeader.classList.toggle('is-header-dark', activeDarkSections.size > 0);
     }, {
       threshold: 0,
-      rootMargin: `-${siteHeader.offsetHeight}px 0px 0px`
+      rootMargin: `-${headerBandHeight}px 0px -${bottomMargin}px 0px`
     }));
-    headerHeroObserver.observe(heroSection);
+    darkHeaderSections.forEach((section) => headerThemeObserver.observe(section));
   }
 
   const disconnectObservers = () => {
