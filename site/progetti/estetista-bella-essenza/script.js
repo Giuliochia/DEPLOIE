@@ -19,10 +19,18 @@
   let pauseUntil = 0;
   let pointerPaused = false;
   let focusPaused = false;
-  let showcaseVisible = true;
+  let showcaseVisible = false;
+  let animationFrameId = 0;
+  let resumeTimer = 0;
+  let pauseShowcaseFor = (duration) => {
+    pauseUntil = Number.isFinite(duration)
+      ? window.performance.now() + duration
+      : Number.POSITIVE_INFINITY;
+  };
   const transitionDuration = 520;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const loopSpeed = 34;
+  reducedMotion.addEventListener('change', () => window.location.reload());
 
   const finishClose = () => {
     if (lightbox.open) lightbox.close();
@@ -63,7 +71,7 @@
     const gap = Number.parseFloat(window.getComputedStyle(showcase).columnGap) || 0;
     const distance = firstItem.getBoundingClientRect().width + gap;
 
-    pauseUntil = window.performance.now() + 1400;
+    pauseShowcaseFor(1400);
     if (!reducedMotion.matches && direction < 0 && showcase.scrollLeft < distance && loopDistance > 0) {
       showcase.scrollLeft += loopDistance;
     }
@@ -100,41 +108,102 @@
       loopPosition = showcase.scrollLeft;
     };
 
-    const animateShowcase = (time) => {
-      const elapsed = lastFrameTime === null ? 0 : Math.min(time - lastFrameTime, 50);
-      const paused = pointerPaused || focusPaused || !showcaseVisible || document.hidden || time < pauseUntil;
+    const stopShowcaseLoop = () => {
+      if (animationFrameId) window.cancelAnimationFrame(animationFrameId);
+      animationFrameId = 0;
+      lastFrameTime = null;
+    };
 
-      if (!paused && loopDistance > 0) {
+    const clearResumeTimer = () => {
+      window.clearTimeout(resumeTimer);
+      resumeTimer = 0;
+    };
+
+    const canAnimateShowcase = () => (
+      !pointerPaused
+      && !focusPaused
+      && showcaseVisible
+      && !document.hidden
+      && window.performance.now() >= pauseUntil
+    );
+
+    const startShowcaseLoop = () => {
+      clearResumeTimer();
+      if (animationFrameId || !canAnimateShowcase()) return;
+      animationFrameId = window.requestAnimationFrame(animateShowcase);
+    };
+
+    const scheduleShowcaseResume = () => {
+      clearResumeTimer();
+      if (!Number.isFinite(pauseUntil)) return;
+      const delay = Math.max(0, pauseUntil - window.performance.now());
+      resumeTimer = window.setTimeout(startShowcaseLoop, delay);
+    };
+
+    pauseShowcaseFor = (duration) => {
+      pauseUntil = Number.isFinite(duration)
+        ? window.performance.now() + duration
+        : Number.POSITIVE_INFINITY;
+      stopShowcaseLoop();
+      scheduleShowcaseResume();
+    };
+
+    const animateShowcase = (time) => {
+      animationFrameId = 0;
+      if (!canAnimateShowcase()) {
+        stopShowcaseLoop();
+        scheduleShowcaseResume();
+        return;
+      }
+
+      const elapsed = lastFrameTime === null ? 0 : Math.min(time - lastFrameTime, 50);
+      if (loopDistance > 0) {
         loopPosition += (loopSpeed * elapsed) / 1000;
         if (loopPosition >= loopDistance) loopPosition -= loopDistance;
         showcase.scrollLeft = loopPosition;
-      } else {
-        loopPosition = showcase.scrollLeft;
       }
 
       lastFrameTime = time;
-      window.requestAnimationFrame(animateShowcase);
+      animationFrameId = window.requestAnimationFrame(animateShowcase);
     };
 
-    showcase.addEventListener('pointerenter', () => { pointerPaused = true; });
-    showcase.addEventListener('pointerleave', () => { pointerPaused = false; });
-    showcase.addEventListener('pointerdown', () => { pauseUntil = Number.POSITIVE_INFINITY; });
-    showcase.addEventListener('pointerup', () => { pauseUntil = window.performance.now() + 1400; });
-    showcase.addEventListener('pointercancel', () => { pauseUntil = window.performance.now() + 1400; });
-    showcase.addEventListener('focusin', () => { focusPaused = true; });
+    showcase.addEventListener('pointerenter', () => {
+      pointerPaused = true;
+      stopShowcaseLoop();
+    });
+    showcase.addEventListener('pointerleave', () => {
+      pointerPaused = false;
+      startShowcaseLoop();
+    });
+    showcase.addEventListener('pointerdown', () => pauseShowcaseFor(Number.POSITIVE_INFINITY));
+    showcase.addEventListener('pointerup', () => pauseShowcaseFor(1400));
+    showcase.addEventListener('pointercancel', () => pauseShowcaseFor(1400));
+    showcase.addEventListener('focusin', () => {
+      focusPaused = true;
+      stopShowcaseLoop();
+    });
     showcase.addEventListener('focusout', (event) => {
-      if (!showcase.contains(event.relatedTarget)) focusPaused = false;
+      if (!showcase.contains(event.relatedTarget)) {
+        focusPaused = false;
+        startShowcaseLoop();
+      }
     });
 
     const visibilityObserver = new IntersectionObserver(([entry]) => {
       showcaseVisible = entry.isIntersecting;
+      if (showcaseVisible) startShowcaseLoop();
+      else stopShowcaseLoop();
     }, { threshold: 0.05 });
 
     visibilityObserver.observe(showcase);
     window.addEventListener('resize', updateLoopDistance);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopShowcaseLoop();
+      else startShowcaseLoop();
+    });
     window.requestAnimationFrame(() => {
       updateLoopDistance();
-      window.requestAnimationFrame(animateShowcase);
+      startShowcaseLoop();
     });
   }
 

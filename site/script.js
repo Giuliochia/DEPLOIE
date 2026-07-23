@@ -26,9 +26,25 @@
     if (e.key === 'Escape') closeMenu();
   });
 
-  // --- Scroll reveal (skips entirely if reduced motion is preferred) ---
+  // --- Shared runtime preferences and breakpoints ---
   const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const prefersReducedMotion = reducedMotionQuery.matches;
+  let prefersReducedMotion = reducedMotionQuery.matches;
+  const motionBreakpoints = {
+    processDesktop: window.matchMedia('(min-width: 821px)'),
+    esigenzeDesktop: window.matchMedia('(min-width: 901px)'),
+    preciseHover: window.matchMedia('(hover: hover) and (pointer: fine)')
+  };
+  const activeObservers = new Set();
+
+  const trackObserver = (observer) => {
+    activeObservers.add(observer);
+    return observer;
+  };
+
+  const disconnectObservers = () => {
+    activeObservers.forEach((observer) => observer.disconnect());
+    activeObservers.clear();
+  };
 
   // --- Ambient logo field: pooled, independent lifecycles while visible ---
   const ambientBackground = document.querySelector('[data-ambient-background]');
@@ -147,7 +163,7 @@
     syncAmbientSize();
     window.addEventListener('resize', syncAmbientSize, { passive: true });
 
-    const ambientObserver = new IntersectionObserver((entries) => {
+    const ambientObserver = trackObserver(new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting && !ambientIsVisible) {
           ambientIsVisible = true;
@@ -157,86 +173,20 @@
           stopAmbientField();
         }
       });
-    }, { threshold: 0 });
+    }, { threshold: 0 }));
     ambientObserver.observe(ambientBackground);
-  }
-
-  // --- Hero mockup: staged build, repeated only while visible ---
-  const hero = document.getElementById('top');
-  if (hero && prefersReducedMotion) {
-    hero.classList.add('hero-motion-ready', 'hero-phase-settled');
-  } else if (hero && 'IntersectionObserver' in window) {
-    const heroPhaseClasses = [
-      'hero-phase-skeleton',
-      'hero-phase-content',
-      'hero-phase-settled',
-      'hero-phase-fade'
-    ];
-    let heroIsVisible = false;
-    let heroRestartFrame = 0;
-    let heroTimers = [];
-
-    const clearHeroSchedule = () => {
-      heroTimers.forEach((timer) => window.clearTimeout(timer));
-      heroTimers = [];
-      cancelAnimationFrame(heroRestartFrame);
-      heroRestartFrame = 0;
-    };
-
-    const setHeroPhase = (phase) => {
-      hero.classList.remove(...heroPhaseClasses);
-      if (phase) hero.classList.add(phase);
-    };
-
-    const runHeroCycle = () => {
-      if (!heroIsVisible) return;
-      clearHeroSchedule();
-      hero.classList.remove('hero-cycle-running');
-      setHeroPhase(null);
-      void hero.offsetWidth;
-
-      heroRestartFrame = requestAnimationFrame(() => {
-        if (!heroIsVisible) return;
-        hero.classList.add('hero-cycle-running');
-        heroTimers.push(window.setTimeout(() => setHeroPhase('hero-phase-skeleton'), 400));
-        heroTimers.push(window.setTimeout(() => setHeroPhase('hero-phase-content'), 800));
-        heroTimers.push(window.setTimeout(() => setHeroPhase('hero-phase-settled'), 1600));
-        heroTimers.push(window.setTimeout(() => setHeroPhase('hero-phase-fade'), 52000));
-        heroTimers.push(window.setTimeout(runHeroCycle, 52300));
-      });
-    };
-
-    const stopHeroCycle = () => {
-      clearHeroSchedule();
-      hero.classList.remove('hero-cycle-running');
-      setHeroPhase(null);
-    };
-
-    hero.classList.add('hero-motion-ready');
-    const heroObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && !heroIsVisible) {
-          heroIsVisible = true;
-          runHeroCycle();
-        } else if (!entry.isIntersecting && heroIsVisible) {
-          heroIsVisible = false;
-          stopHeroCycle();
-        }
-      });
-    }, { threshold: 0.15 });
-    heroObserver.observe(hero);
   }
 
   const revealEls = document.querySelectorAll('.reveal');
   if (!prefersReducedMotion && 'IntersectionObserver' in window) {
-    const io = new IntersectionObserver((entries) => {
+    const io = trackObserver(new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           entry.target.classList.add('in-view');
           io.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }));
     revealEls.forEach((el) => io.observe(el));
   } else {
     revealEls.forEach((el) => el.classList.add('in-view'));
@@ -296,7 +246,7 @@
     };
 
     manifesto.classList.add('manifesto-motion-ready');
-    const manifestoObserver = new IntersectionObserver((entries) => {
+    const manifestoObserver = trackObserver(new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         manifestoIsVisible = entry.isIntersecting;
         if (entry.intersectionRatio >= 0.28 && !manifestoHasActivated) {
@@ -306,7 +256,7 @@
         if (manifestoIsVisible) startManifestoLoop();
         else stopManifestoLoop();
       });
-    }, { threshold: [0, 0.28], rootMargin: '0px 0px -50px 0px' });
+    }, { threshold: [0, 0.28], rootMargin: '0px 0px -50px 0px' }));
     manifestoObserver.observe(manifesto);
   }
 
@@ -316,7 +266,7 @@
     processSystem.classList.add('process-motion-ready');
     const processFlow = processSystem.querySelector('.process-flow');
     const processAnimations = processFlow.querySelectorAll('animateMotion');
-    const processDesktopFlow = window.matchMedia('(min-width: 821px)');
+    const processDesktopFlow = motionBreakpoints.processDesktop;
     let processIsVisible = false;
     let processFlowHasStarted = false;
 
@@ -335,7 +285,7 @@
       if (typeof processFlow.pauseAnimations === 'function') processFlow.pauseAnimations();
     };
 
-    const processObserver = new IntersectionObserver((entries) => {
+    const processObserver = trackObserver(new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           entry.target.classList.add('is-active');
@@ -348,7 +298,7 @@
           pauseProcessFlow();
         }
       });
-    }, { threshold: 0.18, rootMargin: '0px 0px -50px 0px' });
+    }, { threshold: 0.18, rootMargin: '0px 0px -50px 0px' }));
     processObserver.observe(processSystem);
     processDesktopFlow.addEventListener('change', () => {
       if (processIsVisible && processDesktopFlow.matches) startProcessFlow();
@@ -362,7 +312,7 @@
     esigenzeSystem.classList.add('es-motion-ready');
     const esigenzeConnections = esigenzeSystem.querySelector('.es-connections');
     const flowAnimations = esigenzeConnections.querySelectorAll('animateMotion');
-    const desktopFlow = window.matchMedia('(min-width: 901px)');
+    const desktopFlow = motionBreakpoints.esigenzeDesktop;
     let systemIsVisible = false;
     let flowHasStarted = false;
 
@@ -381,7 +331,7 @@
       if (typeof esigenzeConnections.pauseAnimations === 'function') esigenzeConnections.pauseAnimations();
     };
 
-    const esigenzeObserver = new IntersectionObserver((entries) => {
+    const esigenzeObserver = trackObserver(new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           entry.target.classList.add('is-active');
@@ -394,7 +344,7 @@
           pauseFlow();
         }
       });
-    }, { threshold: 0.25, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0.25, rootMargin: '0px 0px -40px 0px' }));
     esigenzeObserver.observe(esigenzeSystem);
     desktopFlow.addEventListener('change', () => {
       if (systemIsVisible && desktopFlow.matches) startFlow();
@@ -403,7 +353,7 @@
   }
 
   // --- Esigenze cards: pointer tilt, independent from the SVG flow ---
-  const preciseHover = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const preciseHover = motionBreakpoints.preciseHover;
   if (esigenzeSystem && !prefersReducedMotion && preciseHover.matches) {
     const tiltCards = esigenzeSystem.querySelectorAll('.es-node');
     const maxTilt = 9;
@@ -442,8 +392,13 @@
 
   // --- Back to top button ---
   const toTop = document.getElementById('toTop');
-  window.addEventListener('scroll', () => {
+  let toTopFrame = 0;
+  const updateToTop = () => {
+    toTopFrame = 0;
     toTop.classList.toggle('visible', window.scrollY > 600);
+  };
+  window.addEventListener('scroll', () => {
+    if (!toTopFrame) toTopFrame = window.requestAnimationFrame(updateToTop);
   }, { passive: true });
   toTop.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
@@ -463,6 +418,14 @@
     formConfirmation.focus();
     ctaForm.reset();
   });
+
+  reducedMotionQuery.addEventListener('change', (event) => {
+    if (prefersReducedMotion === event.matches) return;
+    prefersReducedMotion = event.matches;
+    disconnectObservers();
+    window.location.reload();
+  });
+  window.addEventListener('pagehide', disconnectObservers, { once: true });
 
   document.getElementById('currentYear').textContent = new Date().getFullYear();
 })();
