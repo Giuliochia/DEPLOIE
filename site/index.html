@@ -4,6 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DEPLOIE — Strumenti digitali costruiti intorno al tuo lavoro.</title>
+<script>
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.classList.add('hero-motion-pending');
+    window.addEventListener('load', () => {
+      window.setTimeout(() => {
+        if (!window.DeploieMotion?.getState().available) {
+          document.documentElement.classList.remove('hero-motion-pending');
+        }
+      }, 120);
+    }, { once: true });
+  }
+</script>
 <link rel="icon" href="assets/symbol-color.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,34 +52,181 @@
 </header>
 
 <main id="main">
-  <div class="ambient-background" data-ambient-background aria-hidden="true">
-    <svg class="ambient-background-svg" focusable="false">
-      <g class="ambient-logo"><path d="M42 92H30C18 92 10 82 10 70V30C10 18 18 10 30 10H70C82 10 90 18 90 30V70C90 82 82 92 70 92H58"></path><rect x="44" y="84" width="12" height="12" rx="2" ry="2"></rect></g>
-      <g class="ambient-logo"><path d="M42 92H30C18 92 10 82 10 70V30C10 18 18 10 30 10H70C82 10 90 18 90 30V70C90 82 82 92 70 92H58"></path><rect x="44" y="84" width="12" height="12" rx="2" ry="2"></rect></g>
-      <g class="ambient-logo"><path d="M42 92H30C18 92 10 82 10 70V30C10 18 18 10 30 10H70C82 10 90 18 90 30V70C90 82 82 92 70 92H58"></path><rect x="44" y="84" width="12" height="12" rx="2" ry="2"></rect></g>
-      <g class="ambient-logo"><path d="M42 92H30C18 92 10 82 10 70V30C10 18 18 10 30 10H70C82 10 90 18 90 30V70C90 82 82 92 70 92H58"></path><rect x="44" y="84" width="12" height="12" rx="2" ry="2"></rect></g>
-      <g class="ambient-logo"><path d="M42 92H30C18 92 10 82 10 70V30C10 18 18 10 30 10H70C82 10 90 18 90 30V70C90 82 82 92 70 92H58"></path><rect x="44" y="84" width="12" height="12" rx="2" ry="2"></rect></g>
-      <g class="ambient-logo"><path d="M42 92H30C18 92 10 82 10 70V30C10 18 18 10 30 10H70C82 10 90 18 90 30V70C90 82 82 92 70 92H58"></path><rect x="44" y="84" width="12" height="12" rx="2" ry="2"></rect></g>
-    </svg>
-  </div>
   <section id="top" class="hero">
     <div class="wrap hero-inner">
       <div class="hero-copy">
-        <h1>Strumenti digitali costruiti sul tuo lavoro.</h1>
+        <h1>
+          <span class="hero-title-reveal">Partiamo dal problema reale</span>
+          <span class="hero-title-reveal">per costruire</span>
+          <span class="hero-title-reveal">uno strumento utile</span>
+        </h1>
         <p class="hero-text">Partiamo dal problema reale, non dalla soluzione immaginata.</p>
         <div class="hero-ctas">
           <a href="#contatti" class="btn btn-primary">Raccontaci la tua attività</a>
         </div>
       </div>
       <div class="hero-visual">
-        <img class="hero-method-diagram" src="assets/hero-diagramma-metodo.png" alt="Diagramma che mostra diverse richieste iniziali di un cliente (preventivi lenti, funzioni inutili, idee scartate) che vengono analizzate e convergono in un unico strumento utile, a rappresentare il metodo DEPLOIE di partire dal problema reale prima di costruire" width="2048" height="2048">
+        <svg class="hero-method-diagram" viewBox="0 0 1024 1024" role="img" aria-labelledby="hero-diagram-title hero-diagram-desc">
+          <title id="hero-diagram-title">Dal problema reale a uno strumento utile</title>
+          <desc id="hero-diagram-desc">Richieste, problemi e ipotesi vengono analizzati e collegati fino a convergere in un unico strumento utile.</desc>
+          <defs>
+            <filter id="hero-card-shadow" x="-16%" y="-14%" width="142%" height="148%">
+              <feDropShadow dx="5" dy="9" stdDeviation="7" flood-color="#1e1b16" flood-opacity=".16"></feDropShadow>
+            </filter>
+            <linearGradient id="hero-card-paper" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#fbf8f1"></stop>
+              <stop offset="1" stop-color="#eee9df"></stop>
+            </linearGradient>
+            <linearGradient id="hero-card-gold" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f0bd45"></stop>
+              <stop offset="1" stop-color="#d99d27"></stop>
+            </linearGradient>
+          </defs>
+
+          <g class="hero-diagram-background" aria-hidden="true">
+            <rect class="hero-card hero-card-back" x="175" y="72" width="238" height="250" rx="3"></rect>
+            <rect class="hero-card hero-card-back" x="472" y="118" width="214" height="245" rx="3"></rect>
+            <rect class="hero-card hero-card-back" x="616" y="186" width="164" height="244" rx="3"></rect>
+            <rect class="hero-card hero-card-back" x="90" y="465" width="210" height="265" rx="3"></rect>
+            <rect class="hero-card hero-card-back" x="485" y="385" width="195" height="265" rx="3"></rect>
+            <rect class="hero-card hero-card-back" x="565" y="575" width="176" height="240" rx="3"></rect>
+            <rect class="hero-card hero-card-back" x="208" y="674" width="192" height="242" rx="3"></rect>
+            <rect class="hero-card hero-card-back" x="420" y="726" width="208" height="232" rx="3"></rect>
+          </g>
+
+          <g class="hero-diagram-connections-in" aria-hidden="true">
+            <path class="hero-diagram-path hero-diagram-path-soft hero-connection-primary" pathLength="1" d="M285 210 C374 228 462 315 550 416"></path>
+            <path class="hero-diagram-path hero-diagram-path-soft hero-connection-analysis" pathLength="1" d="M647 210 C635 286 612 348 590 418"></path>
+            <path class="hero-diagram-path hero-diagram-path-soft hero-connection-analysis" pathLength="1" d="M170 412 C294 430 421 430 530 456"></path>
+            <path class="hero-diagram-path hero-diagram-path-soft hero-connection-secondary" pathLength="1" d="M255 590 C345 560 390 515 475 472"></path>
+            <path class="hero-diagram-path hero-diagram-path-soft hero-connection-secondary" pathLength="1" d="M302 812 C385 705 420 585 505 504"></path>
+          </g>
+
+          <g class="hero-diagram-input-nodes">
+            <g class="hero-diagram-node hero-input-node hero-node-problem" style="--node-order:0">
+              <rect class="hero-card" x="186" y="78" width="222" height="160" rx="3"></rect>
+              <circle class="hero-card-pin" cx="389" cy="96" r="8"></circle>
+              <text class="hero-card-label" x="210" y="126"><tspan x="210">Problema</tspan><tspan x="210" dy="30">reale</tspan></text>
+              <path class="hero-card-mark" d="M212 181 q14-8 28 0 t28 0 t28 0"></path>
+              <path class="hero-card-mark" d="M212 200 q14-8 28 0 t28 0 t28 0"></path>
+            </g>
+
+            <g class="hero-diagram-node hero-input-node hero-node-requests" style="--node-order:1">
+              <rect class="hero-card" x="544" y="126" width="176" height="184" rx="3"></rect>
+              <text class="hero-card-label" x="575" y="191"><tspan x="575">Richieste</tspan><tspan x="575" dy="30">sparse</tspan></text>
+            </g>
+
+            <g class="hero-diagram-node hero-input-node hero-node-quotes" style="--node-order:2">
+              <rect class="hero-card" x="45" y="236" width="238" height="214" rx="3"></rect>
+              <circle class="hero-card-pin" cx="65" cy="255" r="8"></circle>
+              <text class="hero-card-label" x="88" y="321"><tspan x="88">Preventivi</tspan><tspan x="88" dy="30">lenti</tspan></text>
+              <path class="hero-card-mark" d="M88 383 q14-8 28 0 t28 0 t28 0"></path>
+              <path class="hero-card-mark" d="M88 402 q14-8 28 0 t28 0 t28 0"></path>
+            </g>
+
+            <g class="hero-diagram-node hero-input-node hero-node-useless" style="--node-order:3">
+              <rect class="hero-card" x="334" y="112" width="194" height="246" rx="3"></rect>
+              <path class="hero-card-cross" d="M378 160 L484 266 M484 160 L378 266"></path>
+              <text class="hero-card-label hero-card-label-center" x="431" y="289"><tspan x="431">Funzione</tspan><tspan x="431" dy="30">inutile</tspan></text>
+            </g>
+
+            <g class="hero-diagram-node hero-input-node hero-node-showcase" style="--node-order:4">
+              <rect class="hero-card" x="112" y="445" width="202" height="222" rx="3"></rect>
+              <circle class="hero-card-pin" cx="130" cy="464" r="8"></circle>
+              <path class="hero-card-cross" d="M157 487 L263 593 M263 487 L157 593"></path>
+              <text class="hero-card-label hero-card-label-center" x="213" y="614"><tspan x="213">Sito</tspan><tspan x="213" dy="30">vetrina</tspan></text>
+            </g>
+
+            <g class="hero-diagram-node hero-input-node hero-node-discarded" style="--node-order:5">
+              <rect class="hero-card" x="76" y="737" width="184" height="214" rx="3"></rect>
+              <circle class="hero-card-pin" cx="94" cy="756" r="8"></circle>
+              <path class="hero-card-cross" d="M120 781 L216 877 M216 781 L120 877"></path>
+              <text class="hero-card-label hero-card-label-center" x="168" y="902"><tspan x="168">Idea</tspan><tspan x="168" dy="30">scartata</tspan></text>
+            </g>
+          </g>
+
+          <g class="hero-diagram-method">
+            <g class="hero-diagram-node hero-method-node hero-node-appointments" style="--node-order:0">
+              <rect class="hero-card" x="250" y="342" width="190" height="162" rx="3"></rect>
+              <circle class="hero-card-pin" cx="268" cy="361" r="8"></circle>
+              <text class="hero-card-label hero-card-label-center" x="345" y="398">Appuntamenti</text>
+              <g class="hero-dot-grid">
+                <circle cx="313" cy="424" r="2"></circle><circle cx="329" cy="424" r="2"></circle><circle cx="345" cy="424" r="2"></circle><circle cx="361" cy="424" r="2"></circle><circle cx="377" cy="424" r="2"></circle>
+                <circle cx="313" cy="440" r="2"></circle><circle cx="329" cy="440" r="2"></circle><circle cx="345" cy="440" r="2"></circle><circle cx="361" cy="440" r="2"></circle><circle cx="377" cy="440" r="2"></circle>
+              </g>
+            </g>
+
+            <g class="hero-diagram-node hero-method-node hero-node-clients" style="--node-order:1">
+              <rect class="hero-card" x="380" y="432" width="206" height="222" rx="3"></rect>
+              <circle class="hero-card-pin" cx="399" cy="451" r="8"></circle>
+              <text class="hero-card-label hero-card-label-center" x="483" y="481">Clienti</text>
+              <g class="hero-client-icon">
+                <circle cx="483" cy="527" r="15"></circle>
+                <circle cx="451" cy="520" r="12"></circle>
+                <circle cx="515" cy="520" r="12"></circle>
+                <path d="M458 573 v-10 c0-18 10-29 25-29 s25 11 25 29 v10"></path>
+                <path d="M425 559 v-8 c0-14 9-23 22-23 M519 528 c13 0 22 9 22 23 v8"></path>
+              </g>
+              <path class="hero-card-rule" d="M425 610 H541 M425 628 H525"></path>
+            </g>
+
+            <g class="hero-diagram-node hero-method-node hero-node-automation" style="--node-order:2">
+              <rect class="hero-card" x="260" y="590" width="226" height="174" rx="3"></rect>
+              <circle class="hero-card-pin" cx="279" cy="609" r="8"></circle>
+              <text class="hero-card-label hero-card-label-center" x="373" y="651">Automazione</text>
+              <g class="hero-dot-grid">
+                <circle cx="319" cy="682" r="2"></circle><circle cx="341" cy="682" r="2"></circle><circle cx="363" cy="682" r="2"></circle><circle cx="385" cy="682" r="2"></circle><circle cx="407" cy="682" r="2"></circle><circle cx="429" cy="682" r="2"></circle>
+                <circle cx="319" cy="704" r="2"></circle><circle cx="341" cy="704" r="2"></circle><circle cx="363" cy="704" r="2"></circle><circle cx="385" cy="704" r="2"></circle><circle cx="407" cy="704" r="2"></circle><circle cx="429" cy="704" r="2"></circle>
+              </g>
+            </g>
+
+            <g class="hero-diagram-node hero-method-node hero-node-booking" style="--node-order:3">
+              <rect class="hero-card" x="226" y="756" width="204" height="166" rx="3"></rect>
+              <circle class="hero-card-pin" cx="245" cy="775" r="8"></circle>
+              <text class="hero-card-label hero-card-label-center hero-card-label-small" x="328" y="805">Prenotazione</text>
+              <g class="hero-calendar-icon">
+                <rect x="307" y="830" width="43" height="39" rx="2"></rect>
+                <path d="M307 840 H350 M316 824 V835 M341 824 V835"></path>
+                <circle cx="319" cy="850" r="1.5"></circle><circle cx="329" cy="850" r="1.5"></circle><circle cx="339" cy="850" r="1.5"></circle>
+                <circle cx="319" cy="860" r="1.5"></circle><circle cx="329" cy="860" r="1.5"></circle><circle cx="339" cy="860" r="1.5"></circle>
+              </g>
+            </g>
+
+            <g class="hero-diagram-node hero-method-node hero-node-redundant" style="--node-order:4">
+              <rect class="hero-card" x="432" y="756" width="174" height="216" rx="3"></rect>
+              <circle class="hero-card-pin" cx="451" cy="775" r="8"></circle>
+              <path class="hero-card-cross" d="M470 802 L565 897 M565 802 L470 897"></path>
+              <text class="hero-card-label hero-card-label-center hero-card-label-small" x="519" y="918"><tspan x="519">Funzionalità</tspan><tspan x="519" dy="26">ridondante</tspan></text>
+            </g>
+          </g>
+
+          <g class="hero-diagram-connections-out" aria-hidden="true">
+            <path class="hero-diagram-path hero-output-path hero-output-path-structural" pathLength="1" d="M415 310 C555 336 694 430 842 510"></path>
+            <path class="hero-diagram-path hero-output-path hero-output-path-primary" pathLength="1" d="M646 520 C716 520 770 521 842 522"></path>
+            <path class="hero-diagram-path hero-output-path hero-output-path-structural" pathLength="1" d="M401 734 C570 704 716 590 842 530"></path>
+            <path class="hero-diagram-path hero-output-path hero-output-path-structural" pathLength="1" d="M375 920 C556 810 704 648 842 536"></path>
+            <path class="hero-diagram-path hero-output-path hero-output-path-structural" pathLength="1" d="M606 858 C692 727 760 608 842 522"></path>
+          </g>
+
+          <g class="hero-diagram-output">
+            <circle class="hero-convergence-point" cx="842" cy="522" r="6"></circle>
+            <g class="hero-output-node">
+              <rect class="hero-card hero-card-output" x="850" y="424" width="154" height="248" rx="4"></rect>
+              <circle class="hero-card-pin hero-card-pin-output" cx="868" cy="442" r="8"></circle>
+              <text class="hero-card-label hero-card-label-center hero-output-label" x="927" y="501"><tspan x="927">Strumento</tspan><tspan x="927" dy="30">utile</tspan></text>
+              <circle class="hero-output-check-ring" cx="927" cy="584" r="31"></circle>
+              <path class="hero-output-check" pathLength="1" d="M909 584 L922 598 L947 567"></path>
+            </g>
+          </g>
+        </svg>
       </div>
     </div>
   </section>
 
   <section id="cosa-semplificare" class="esigenze">
+    <span class="hero-esigenze-bridge" aria-hidden="true"><span></span></span>
     <div class="wrap">
-      <div class="esigenze-head reveal">
+      <div class="esigenze-head">
         <p class="eyebrow">Cosa possiamo semplificare</p>
         <h2>Quando il digitale può semplificare il lavoro</h2>
         <p class="esigenze-intro">Alcuni problemi si ripetono: farsi capire, organizzare meglio il lavoro e rendere più semplice il rapporto con i clienti.</p>
@@ -78,8 +237,6 @@
             <marker id="es-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto">
               <path d="M 0 0 L 8 4 L 0 8" class="es-arrow-head"></path>
             </marker>
-            <path id="es-flow-top" d="M218 160 C350 154 314 276 463 257 C555 250 650 234 731 234 H812 Q840 234 840 207 V164 Q840 143 864 143 H936"></path>
-            <path id="es-flow-bottom" d="M228 345 C340 360 350 294 463 273 C555 266 650 300 731 300 H812 Q840 300 840 326 V381 Q840 405 864 405 H936"></path>
           </defs>
           <g class="es-chaos-lines">
             <path class="es-path es-path-soft" pathLength="1" d="M245 105 C330 96 336 210 463 246"></path>
@@ -99,20 +256,6 @@
             <path class="es-path es-path-soft" pathLength="1" d="M731 286 H800 Q825 286 825 310 V366 Q825 390 850 390 H930"></path>
             <path class="es-path es-path-main" pathLength="1" marker-end="url(#es-arrow)" d="M731 300 H812 Q840 300 840 326 V381 Q840 405 864 405 H936"></path>
           </g>
-          <g class="es-flow-particles">
-            <circle r="3.5" class="es-flow-particle es-flow-particle-gold">
-              <animateMotion dur="3.4s" begin="indefinite" repeatCount="indefinite" calcMode="spline" keyPoints="0;0.44;1" keyTimes="0;0.48;1" keySplines=".4 0 .6 1;.4 0 .6 1"><mpath href="#es-flow-top"></mpath></animateMotion>
-            </circle>
-            <rect x="-3" y="-3" width="6" height="6" rx="1" class="es-flow-particle">
-              <animateMotion dur="4.1s" begin="indefinite" repeatCount="indefinite" calcMode="spline" keyPoints="0;0.44;1" keyTimes="0;0.52;1" keySplines=".35 0 .65 1;.35 0 .65 1"><mpath href="#es-flow-top"></mpath></animateMotion>
-            </rect>
-            <circle r="2.5" class="es-flow-particle">
-              <animateMotion dur="3.8s" begin="indefinite" repeatCount="indefinite" calcMode="spline" keyPoints="0;0.44;1" keyTimes="0;0.46;1" keySplines=".45 0 .55 1;.45 0 .55 1"><mpath href="#es-flow-bottom"></mpath></animateMotion>
-            </circle>
-            <rect x="-2.5" y="-2.5" width="5" height="5" rx="1" class="es-flow-particle es-flow-particle-gold">
-              <animateMotion dur="4.4s" begin="indefinite" repeatCount="indefinite" calcMode="spline" keyPoints="0;0.44;1" keyTimes="0;0.5;1" keySplines=".4 0 .6 1;.4 0 .6 1"><mpath href="#es-flow-bottom"></mpath></animateMotion>
-            </rect>
-          </g>
         </svg>
 
         <div class="es-hub">
@@ -120,6 +263,7 @@
         </div>
 
         <article class="es-node es-node-entry">
+          <div class="es-node-tilt">
           <span class="es-node-icon" aria-hidden="true">
             <svg viewBox="0 0 32 32"><circle cx="14" cy="14" r="7"></circle><path d="m19 19 6 6"></path></svg>
           </span>
@@ -127,9 +271,11 @@
             <h3>Essere trovati</h3>
             <p>Presenza online chiara e orientata all’azione.</p>
           </div>
+          </div>
         </article>
 
         <article class="es-node es-node-control">
+          <div class="es-node-tilt">
           <span class="es-node-icon" aria-hidden="true">
             <svg viewBox="0 0 32 32"><path d="M7 25V19M13 25V14M19 25V10M25 25V6"></path><path d="m7 14 6-4 6 1 6-6"></path></svg>
           </span>
@@ -137,15 +283,18 @@
             <h3>Tenere il lavoro sotto controllo</h3>
             <p>Strumenti semplici costruiti sul processo reale.</p>
           </div>
+          </div>
         </article>
 
         <article class="es-node es-node-clients">
+          <div class="es-node-tilt">
           <span class="es-node-icon" aria-hidden="true">
             <svg viewBox="0 0 32 32"><circle cx="11" cy="11" r="4"></circle><circle cx="22" cy="12" r="3"></circle><path d="M4 26c0-5 3-8 7-8s7 3 7 8M18 20c1-1 2-2 4-2 4 0 6 3 6 7"></path></svg>
           </span>
           <div>
             <h3>Semplificare il rapporto con i clienti</h3>
             <p>Contatti, accessi, prenotazioni e informazioni più fluidi.</p>
+          </div>
           </div>
         </article>
       </div>

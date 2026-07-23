@@ -52,137 +52,6 @@
     activeObservers.clear();
   };
 
-  // --- Ambient logo field: pooled, independent lifecycles while visible ---
-  const ambientBackground = document.querySelector('[data-ambient-background]');
-  if (ambientBackground && !prefersReducedMotion && 'IntersectionObserver' in window) {
-    const ambientSvg = ambientBackground.querySelector('.ambient-background-svg');
-    const ambientLogos = Array.from(ambientSvg.querySelectorAll('.ambient-logo')).map((group) => ({
-      group,
-      path: group.querySelector('path'),
-      accent: group.querySelector('rect'),
-      pathLength: group.querySelector('path').getTotalLength(),
-      timers: []
-    }));
-    const esigenzeSection = document.getElementById('cosa-semplificare');
-    let ambientIsVisible = false;
-
-    const randomBetween = (min, max) => min + Math.random() * (max - min);
-
-    const clearAmbientInstance = (instance) => {
-      instance.timers.forEach((timer) => window.clearTimeout(timer));
-      instance.timers = [];
-      instance.group.style.transition = 'none';
-      instance.group.style.opacity = '0';
-      instance.path.style.transition = 'none';
-      instance.accent.style.transition = 'none';
-      instance.accent.style.opacity = '0';
-    };
-
-    const scheduleAmbient = (instance, callback, delay) => {
-      const timer = window.setTimeout(() => {
-        instance.timers = instance.timers.filter((activeTimer) => activeTimer !== timer);
-        if (ambientIsVisible) callback();
-      }, delay);
-      instance.timers.push(timer);
-    };
-
-    const syncAmbientSize = () => {
-      if (!esigenzeSection) return;
-      const mainRect = document.getElementById('main').getBoundingClientRect();
-      const esigenzeRect = esigenzeSection.getBoundingClientRect();
-      ambientBackground.style.height = `${Math.ceil(esigenzeRect.bottom - mainRect.top)}px`;
-    };
-
-    const runAmbientInstance = (instance) => {
-      if (!ambientIsVisible) return;
-      clearAmbientInstance(instance);
-
-      const bounds = ambientBackground.getBoundingClientRect();
-      const visibleTop = Math.max(0, -bounds.top);
-      const visibleBottom = Math.min(bounds.height, window.innerHeight - bounds.top);
-      const scale = randomBetween(.25, .6);
-      const size = 100 * scale;
-      const x = randomBetween(0, Math.max(0, bounds.width - size));
-      const y = randomBetween(visibleTop, Math.max(visibleTop, visibleBottom - size));
-      const rotation = randomBetween(-10, 10);
-      const driftX = randomBetween(-40, 40);
-      const driftY = randomBetween(-40, 40);
-      const drawDuration = randomBetween(1300, 1900);
-      const holdDuration = randomBetween(2200, 3200);
-      const pauseDuration = randomBetween(400, 1200);
-      const variant = Math.floor(Math.random() * 3);
-      const outlineDelay = variant === 2 ? 240 : 0;
-      const totalDrawDuration = drawDuration + outlineDelay;
-      const startOffset = variant === 1 ? -instance.pathLength : instance.pathLength;
-      const endOffset = variant === 1 ? instance.pathLength : -instance.pathLength;
-      const startTransform = `translate(${x}px, ${y}px) rotate(${rotation}deg) scale(${scale})`;
-      const endTransform = `translate(${x + driftX}px, ${y + driftY}px) rotate(${rotation}deg) scale(${scale})`;
-
-      instance.group.style.transition = 'none';
-      instance.group.style.transform = startTransform;
-      instance.group.style.opacity = '.72';
-      instance.path.style.strokeDasharray = `${instance.pathLength}`;
-      instance.path.style.strokeDashoffset = `${startOffset}`;
-      instance.path.style.transition = 'none';
-      instance.accent.style.transition = 'none';
-      instance.accent.style.opacity = variant === 2 ? '1' : '0';
-      void instance.group.getBoundingClientRect();
-
-      instance.group.style.transition = `transform ${totalDrawDuration + holdDuration}ms linear`;
-      instance.group.style.transform = endTransform;
-
-      scheduleAmbient(instance, () => {
-        instance.path.style.transition = `stroke-dashoffset ${drawDuration}ms cubic-bezier(.65,0,.35,1)`;
-        instance.path.style.strokeDashoffset = '0';
-        if (variant !== 2) {
-          instance.accent.style.transition = 'opacity 350ms ease';
-          scheduleAmbient(instance, () => {
-            instance.accent.style.opacity = '1';
-          }, Math.max(0, drawDuration - 350));
-        }
-      }, outlineDelay);
-
-      scheduleAmbient(instance, () => {
-        instance.group.style.transition = 'opacity 700ms ease';
-        instance.group.style.opacity = '0';
-        instance.path.style.transition = 'stroke-dashoffset 700ms cubic-bezier(.65,0,.35,1)';
-        instance.path.style.strokeDashoffset = `${endOffset}`;
-        instance.accent.style.transition = 'opacity 420ms ease';
-        instance.accent.style.opacity = '0';
-      }, totalDrawDuration + holdDuration);
-
-      scheduleAmbient(instance, () => {
-        runAmbientInstance(instance);
-      }, totalDrawDuration + holdDuration + 700 + pauseDuration);
-    };
-
-    const stopAmbientField = () => {
-      ambientLogos.forEach(clearAmbientInstance);
-    };
-
-    const startAmbientField = () => {
-      ambientLogos.forEach((instance, index) => {
-        scheduleAmbient(instance, () => runAmbientInstance(instance), index * 260 + randomBetween(0, 500));
-      });
-    };
-
-    syncAmbientSize();
-    window.addEventListener('resize', syncAmbientSize, { passive: true });
-
-    const ambientObserver = trackObserver(new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && !ambientIsVisible) {
-          ambientIsVisible = true;
-          startAmbientField();
-        } else if (!entry.isIntersecting && ambientIsVisible) {
-          ambientIsVisible = false;
-          stopAmbientField();
-        }
-      });
-    }, { threshold: 0 }));
-    ambientObserver.observe(ambientBackground);
-  }
-
   const revealEls = document.querySelectorAll('.reveal');
   if (!prefersReducedMotion && 'IntersectionObserver' in window) {
     const io = trackObserver(new IntersectionObserver((entries) => {
@@ -312,88 +181,38 @@
     });
   }
 
-  // --- Esigenze system: one controlled activation when it enters the viewport ---
+  // --- Esigenze cards: restrained inner tilt after the GSAP entrance ---
   const esigenzeSystem = document.querySelector('[data-es-system]');
-  if (esigenzeSystem && !prefersReducedMotion && 'IntersectionObserver' in window) {
-    esigenzeSystem.classList.add('es-motion-ready');
-    const esigenzeConnections = esigenzeSystem.querySelector('.es-connections');
-    const flowAnimations = esigenzeConnections.querySelectorAll('animateMotion');
-    const desktopFlow = motionBreakpoints.esigenzeDesktop;
-    let systemIsVisible = false;
-    let flowHasStarted = false;
-
-    const startFlow = () => {
-      if (!desktopFlow.matches) return;
-      if (typeof esigenzeConnections.unpauseAnimations === 'function') esigenzeConnections.unpauseAnimations();
-      if (!flowHasStarted) {
-        flowAnimations.forEach((animation) => {
-          if (typeof animation.beginElement === 'function') animation.beginElement();
-        });
-        flowHasStarted = true;
-      }
-    };
-
-    const pauseFlow = () => {
-      if (typeof esigenzeConnections.pauseAnimations === 'function') esigenzeConnections.pauseAnimations();
-    };
-
-    const esigenzeObserver = trackObserver(new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-active');
-          entry.target.classList.add('is-running');
-          systemIsVisible = true;
-          startFlow();
-        } else {
-          entry.target.classList.remove('is-running');
-          systemIsVisible = false;
-          pauseFlow();
-        }
-      });
-    }, { threshold: 0.25, rootMargin: '0px 0px -40px 0px' }));
-    esigenzeObserver.observe(esigenzeSystem);
-    desktopFlow.addEventListener('change', () => {
-      if (systemIsVisible && desktopFlow.matches) startFlow();
-      else pauseFlow();
-    });
-  }
-
-  // --- Esigenze cards: pointer tilt, independent from the SVG flow ---
   const preciseHover = motionBreakpoints.preciseHover;
   if (esigenzeSystem && !prefersReducedMotion && preciseHover.matches) {
     const tiltCards = esigenzeSystem.querySelectorAll('.es-node');
-    const maxTilt = 9;
+    let tiltInitialized = false;
 
-    tiltCards.forEach((card) => {
-      let resetTimer = 0;
+    const initializeTilt = () => {
+      if (tiltInitialized) return;
+      tiltInitialized = true;
 
-      card.addEventListener('mouseenter', () => {
-        window.clearTimeout(resetTimer);
-        card.classList.add('is-tilting');
-        card.style.transition = 'transform .12s cubic-bezier(.16,1,.3,1)';
+      tiltCards.forEach((card) => {
+        const tiltLayer = card.querySelector('.es-node-tilt');
+        if (!tiltLayer) return;
+
+        card.addEventListener('mousemove', (event) => {
+          const rect = card.getBoundingClientRect();
+          const pointerX = (event.clientX - rect.left) / rect.width;
+          const pointerY = (event.clientY - rect.top) / rect.height;
+          const rotateX = (0.5 - pointerY) * 5;
+          const rotateY = (pointerX - 0.5) * 5;
+          tiltLayer.style.transform = `perspective(900px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale(1.006)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+          tiltLayer.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) scale(1)';
+        });
       });
+    };
 
-      card.addEventListener('mousemove', (event) => {
-        const rect = card.getBoundingClientRect();
-        const pointerX = (event.clientX - rect.left) / rect.width;
-        const pointerY = (event.clientY - rect.top) / rect.height;
-        const rotateX = (0.5 - pointerY) * maxTilt * 2;
-        const rotateY = (pointerX - 0.5) * maxTilt * 2;
-
-        card.style.transform = `perspective(700px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale(1.02)`;
-      });
-
-      card.addEventListener('mouseleave', () => {
-        card.style.transition = 'transform .3s cubic-bezier(.16,1,.3,1)';
-        card.style.transform = 'perspective(700px) rotateX(0deg) rotateY(0deg) scale(1)';
-
-        resetTimer = window.setTimeout(() => {
-          card.classList.remove('is-tilting');
-          card.style.removeProperty('transition');
-          card.style.removeProperty('transform');
-        }, 300);
-      });
-    });
+    esigenzeSystem.addEventListener('deploie:motion-complete', initializeTilt, { once: true });
+    if (!window.DeploieMotion?.getState().available) initializeTilt();
   }
 
   // --- Back to top button ---
