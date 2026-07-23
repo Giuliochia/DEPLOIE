@@ -248,11 +248,18 @@
             <marker id="es-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto">
               <path d="M 0 0 L 8 4 L 0 8" class="es-arrow-head"></path>
             </marker>
+            <filter id="es-signal-glow" x="-250%" y="-250%" width="600%" height="600%">
+              <feGaussianBlur stdDeviation="4" result="blur"></feGaussianBlur>
+              <feMerge>
+                <feMergeNode in="blur"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+              </feMerge>
+            </filter>
           </defs>
           <g class="es-chaos-lines">
             <path class="es-path es-path-soft" pathLength="1" d="M245 105 C330 96 336 210 463 246"></path>
             <path class="es-path es-path-soft" pathLength="1" d="M218 160 C350 154 314 276 463 257"></path>
-            <path class="es-path es-path-main" pathLength="1" marker-end="url(#es-arrow)" d="M270 260 C350 260 390 260 463 260"></path>
+            <path id="es-main-entry" class="es-path es-path-main" pathLength="1" marker-end="url(#es-arrow)" d="M270 260 C350 260 390 260 463 260"></path>
             <path class="es-path es-path-soft" pathLength="1" d="M228 345 C340 360 350 294 463 273"></path>
             <path class="es-path es-path-soft" pathLength="1" d="M258 414 C338 408 350 320 463 282"></path>
             <circle cx="278" cy="125" r="3" class="es-particle"></circle>
@@ -263,14 +270,33 @@
           </g>
           <g class="es-order-lines">
             <path class="es-path es-path-soft" pathLength="1" d="M731 220 H800 Q825 220 825 195 V150 Q825 128 850 128 H930"></path>
-            <path class="es-path es-path-main" pathLength="1" marker-end="url(#es-arrow)" d="M731 234 H812 Q840 234 840 207 V164 Q840 143 864 143 H936"></path>
+            <path id="es-main-control" class="es-path es-path-main" pathLength="1" marker-end="url(#es-arrow)" d="M731 234 H812 Q840 234 840 207 V164 Q840 143 864 143 H936"></path>
             <path class="es-path es-path-soft" pathLength="1" d="M731 286 H800 Q825 286 825 310 V366 Q825 390 850 390 H930"></path>
-            <path class="es-path es-path-main" pathLength="1" marker-end="url(#es-arrow)" d="M731 300 H812 Q840 300 840 326 V381 Q840 405 864 405 H936"></path>
+            <path id="es-main-clients" class="es-path es-path-main" pathLength="1" marker-end="url(#es-arrow)" d="M731 300 H812 Q840 300 840 326 V381 Q840 405 864 405 H936"></path>
+          </g>
+          <g class="es-line-signals" aria-hidden="true">
+            <circle class="es-line-signal" r="7">
+              <animateMotion begin="indefinite" dur="3.2s" repeatCount="indefinite">
+                <mpath href="#es-main-entry"></mpath>
+              </animateMotion>
+            </circle>
+            <circle class="es-line-signal" r="7">
+              <animateMotion begin="indefinite" dur="3.7s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear">
+                <mpath href="#es-main-control"></mpath>
+              </animateMotion>
+            </circle>
+            <circle class="es-line-signal" r="7">
+              <animateMotion begin="indefinite" dur="4.1s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear">
+                <mpath href="#es-main-clients"></mpath>
+              </animateMotion>
+            </circle>
           </g>
         </svg>
 
         <div class="es-hub">
-          <img src="assets/logo-vertical-color.svg" alt="DEPLOIE">
+          <div class="es-hub-core">
+            <img src="assets/logo-vertical-color.svg" alt="DEPLOIE">
+          </div>
         </div>
 
         <article class="es-node es-node-entry">

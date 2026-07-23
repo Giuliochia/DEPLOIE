@@ -32,6 +32,7 @@
     mobileTablet: '(max-width: 820px)',
     reducedMotion: '(prefers-reduced-motion: reduce)',
     esigenzeDesktop: '(min-width: 901px)',
+    esigenzeCompact: '(max-width: 900px)',
     preciseHover: '(hover: hover) and (pointer: fine)'
   });
 
@@ -690,25 +691,39 @@
 
     gsap.set([
       section.querySelector('.esigenze-head'),
-      section.querySelector('.es-hub'),
+      section.querySelector('.es-hub-core'),
       ...section.querySelectorAll('.es-node'),
       ...section.querySelectorAll('.es-particle')
     ], { opacity: 1, x: 0, y: 0, scale: 1, clearProps: 'willChange' });
+    gsap.set(section.querySelector('.es-hub'), {
+      '--es-halo-opacity': 0,
+      '--es-halo-scale': 0.96,
+      '--es-dot-scale': 1
+    });
+    gsap.set(section.querySelectorAll('.es-node'), {
+      boxShadow: 'none',
+      clearProps: 'willChange'
+    });
     gsap.set(section.querySelectorAll('.es-path'), { strokeDashoffset: 0 });
+    gsap.set(section.querySelectorAll('.es-line-signal'), { opacity: 0 });
   };
 
   const createEsigenzeTimeline = ({ compact = false, reducedMotion = false } = {}) => {
-    const { gsap } = getDependencies();
+    const { gsap, ScrollTrigger } = getDependencies();
     const section = document.getElementById('cosa-semplificare');
     if (!section) return null;
 
     const head = section.querySelector('.esigenze-head');
     const hub = section.querySelector('.es-hub');
+    const hubCore = section.querySelector('.es-hub-core');
     const entry = section.querySelector('.es-node-entry');
     const control = section.querySelector('.es-node-control');
     const clients = section.querySelector('.es-node-clients');
     const paths = Array.from(section.querySelectorAll('.es-path'));
     const particles = section.querySelectorAll('.es-particle');
+    const signals = Array.from(section.querySelectorAll('.es-line-signal'));
+    const signalAnimations = signals.map((signal) => signal.querySelector('animateMotion'));
+    const connections = section.querySelector('.es-connections');
     const system = section.querySelector('[data-es-system]');
 
     if (reducedMotion || playedSections.has('esigenze')) {
@@ -719,13 +734,45 @@
     }
 
     const distance = compact ? 14 : 28;
-    gsap.set(head, { opacity: 0, y: compact ? 12 : 20, clipPath: 'inset(0% 0% 24% 0%)' });
-    gsap.set(hub, { opacity: 0, scale: 0.965, willChange: 'transform,opacity' });
-    gsap.set(entry, { opacity: 0, x: -distance, y: compact ? 8 : 0, willChange: 'transform,opacity' });
-    gsap.set(control, { opacity: 0, x: compact ? 0 : distance, y: -distance * 0.45, willChange: 'transform,opacity' });
-    gsap.set(clients, { opacity: 0, x: compact ? 0 : distance * 0.75, y: distance * 0.5, willChange: 'transform,opacity' });
-    gsap.set(paths, { strokeDasharray: 1, strokeDashoffset: 1 });
-    gsap.set(particles, { opacity: 0 });
+    const resetSequenceState = () => {
+      gsap.set(head, { opacity: 0, y: compact ? 12 : 20, clipPath: 'inset(0% 0% 24% 0%)' });
+      gsap.set(hub, {
+        '--es-halo-opacity': 0,
+        '--es-halo-scale': 0.96,
+        '--es-dot-scale': 1
+      });
+      gsap.set(hubCore, {
+        opacity: 0,
+        scale: 0.965,
+        willChange: 'transform,opacity'
+      });
+      gsap.set(entry, {
+        opacity: 0,
+        x: -distance,
+        y: compact ? 8 : 0,
+        boxShadow: 'none',
+        willChange: 'transform,opacity,box-shadow'
+      });
+      gsap.set(control, {
+        opacity: 0,
+        x: compact ? 0 : distance,
+        y: -distance * 0.45,
+        boxShadow: 'none',
+        willChange: 'transform,opacity,box-shadow'
+      });
+      gsap.set(clients, {
+        opacity: 0,
+        x: compact ? 0 : distance * 0.75,
+        y: distance * 0.5,
+        boxShadow: 'none',
+        willChange: 'transform,opacity,box-shadow'
+      });
+      gsap.set(paths, { strokeDasharray: 1, strokeDashoffset: 1 });
+      gsap.set(particles, { opacity: 0 });
+      gsap.set(signals, { opacity: 0 });
+    };
+
+    resetSequenceState();
 
     const timeline = gsap.timeline({
       scrollTrigger: {
@@ -738,35 +785,153 @@
         playedSections.add('esigenze');
         setEsigenzeFinalState();
         system?.dispatchEvent(new CustomEvent('deploie:motion-complete'));
+        entranceComplete = true;
+        startAmbientMotion();
       }
     });
+
+    const cardEase = 'back.out(1.9)';
+    const cardFlash = 'inset 0 0 0 3px rgba(244,240,232,.98), 0 0 30px rgba(217,160,49,.95)';
+    const entryEnd = compact ? 0.68 : 0.9;
+    const controlEnd = compact ? 0.84 : 1.1;
+    const clientsEnd = compact ? 1 : 1.3;
 
     timeline
       .to(head, {
         opacity: 1, y: 0, clipPath: 'inset(0% 0% 0% 0%)',
         duration: compact ? 0.52 : 0.68
       }, 0)
-      .to(entry, { opacity: 1, x: 0, y: 0, duration: compact ? 0.48 : 0.62 }, compact ? 0.2 : 0.28)
-      .to(control, { opacity: 1, x: 0, y: 0, duration: compact ? 0.48 : 0.62 }, compact ? 0.36 : 0.48)
-      .to(clients, { opacity: 1, x: 0, y: 0, duration: compact ? 0.5 : 0.66 }, compact ? 0.5 : 0.64);
+      .to(entry, { opacity: 1, x: 0, y: 0, duration: compact ? 0.48 : 0.62, ease: cardEase }, compact ? 0.2 : 0.28)
+      .to(control, { opacity: 1, x: 0, y: 0, duration: compact ? 0.48 : 0.62, ease: cardEase }, compact ? 0.36 : 0.48)
+      .to(clients, { opacity: 1, x: 0, y: 0, duration: compact ? 0.5 : 0.66, ease: cardEase }, compact ? 0.5 : 0.64)
+      .set(entry, { boxShadow: cardFlash }, entryEnd)
+      .to(entry, { boxShadow: 'inset 0 0 0 0 rgba(244,240,232,0), 0 0 0 rgba(217,160,49,0)', duration: 0.38, ease: 'power2.out' }, entryEnd)
+      .set(control, { boxShadow: cardFlash }, controlEnd)
+      .to(control, { boxShadow: 'inset 0 0 0 0 rgba(244,240,232,0), 0 0 0 rgba(217,160,49,0)', duration: 0.38, ease: 'power2.out' }, controlEnd)
+      .set(clients, { boxShadow: cardFlash }, clientsEnd)
+      .to(clients, { boxShadow: 'inset 0 0 0 0 rgba(244,240,232,0), 0 0 0 rgba(217,160,49,0)', duration: 0.38, ease: 'power2.out' }, clientsEnd);
 
     if (!compact) {
+      const beginSignal = (index) => {
+        if (typeof signalAnimations[index]?.beginElement === 'function') {
+          signalAnimations[index].beginElement();
+        }
+      };
       timeline
         .to(paths.slice(0, 3), { strokeDashoffset: 0, duration: 0.72, stagger: 0.08 }, 0.46)
         .to(paths.slice(3, 6), { strokeDashoffset: 0, duration: 0.76, stagger: 0.07 }, 0.72)
         .to(paths.slice(6), { strokeDashoffset: 0, duration: 0.78, stagger: 0.08 }, 0.96)
+        .to(hub, { '--es-dot-scale': 1.75, duration: 0.13, ease: 'back.out(2.4)' }, 0.46)
+        .to(hub, { '--es-dot-scale': 1, duration: 0.11, ease: 'power2.in' }, 0.59)
+        .to(hub, { '--es-dot-scale': 1.75, duration: 0.13, ease: 'back.out(2.4)' }, 0.72)
+        .to(hub, { '--es-dot-scale': 1, duration: 0.11, ease: 'power2.in' }, 0.85)
+        .to(hub, { '--es-dot-scale': 1.75, duration: 0.13, ease: 'back.out(2.4)' }, 0.96)
+        .to(hub, { '--es-dot-scale': 1, duration: 0.11, ease: 'power2.in' }, 1.09)
         .to(particles, { opacity: 1, duration: 0.42, stagger: 0.035 }, 1.08);
+
+      [
+        [0, 1.34, 3.2],
+        [1, 1.74, 3.7],
+        [2, 1.9, 4.1]
+      ].forEach(([index, start, duration]) => {
+        timeline
+          .set(signals[index], { opacity: 1 }, start)
+          .call(beginSignal, [index], start)
+          .to(signals[index], { opacity: 0, duration: 0.2, ease: 'power2.in' }, start + duration - 0.2);
+      });
     }
 
+    const hubPulseStart = compact ? 0.94 : 1.48;
     timeline
-      .to(hub, { opacity: 1, scale: 1, duration: compact ? 0.52 : 0.66 }, compact ? 0.62 : 1.04)
-      .to(hub, {
-        scale: compact ? 1.012 : 1.022,
-        duration: 0.17,
+      .to(hubCore, { opacity: 1, scale: 1, duration: compact ? 0.52 : 0.66 }, compact ? 0.62 : 1.04)
+      .to(hubCore, {
+        scale: compact ? 1.04 : 1.055,
+        duration: 0.2,
         yoyo: true,
         repeat: 1,
-        ease: motionTokens.ease.reorganize
-      }, compact ? 0.94 : 1.48);
+        ease: 'back.out(1.7)'
+      }, hubPulseStart)
+      .to(hub, {
+        '--es-halo-opacity': 0.58,
+        '--es-halo-scale': 1.5,
+        duration: 0.24,
+        ease: 'power2.out'
+      }, hubPulseStart)
+      .to(hub, {
+        '--es-halo-opacity': 0,
+        '--es-halo-scale': 1.68,
+        duration: 0.48,
+        ease: 'power2.in'
+      }, hubPulseStart + 0.17);
+
+    let sectionIsVisible = false;
+    let entranceComplete = false;
+    let ambientStarted = false;
+    const ambientHalo = gsap.timeline({
+      paused: true,
+      repeat: -1,
+      defaults: { ease: 'sine.inOut' }
+    })
+      .set(hub, {
+        '--es-halo-opacity': 0.2,
+        '--es-halo-scale': 1
+      })
+      .to(hub, {
+        '--es-halo-opacity': 0.5,
+        '--es-halo-scale': 1.3,
+        duration: 1.8
+      })
+      .to(hub, {
+        '--es-halo-opacity': 0.2,
+        '--es-halo-scale': 1,
+        duration: 1.8
+      });
+
+    const startAmbientMotion = () => {
+      if (!entranceComplete || !sectionIsVisible) return;
+
+      if (!ambientStarted) {
+        ambientStarted = true;
+        gsap.set(signals, { opacity: 0.92 });
+        signalAnimations.forEach((animation, index) => {
+          if (typeof animation?.beginElementAt === 'function') animation.beginElementAt(index * 0.72);
+          else if (typeof animation?.beginElement === 'function') animation.beginElement();
+        });
+      }
+
+      if (typeof connections?.unpauseAnimations === 'function') connections.unpauseAnimations();
+      ambientHalo.resume();
+    };
+
+    const pauseAmbientMotion = () => {
+      sectionIsVisible = false;
+      ambientHalo.pause();
+      if (typeof connections?.pauseAnimations === 'function') connections.pauseAnimations();
+    };
+
+    const ambientViewportTrigger = ScrollTrigger.create({
+      trigger: section,
+      start: 'top bottom',
+      end: 'bottom top',
+      onEnter: () => {
+        sectionIsVisible = true;
+        startAmbientMotion();
+      },
+      onEnterBack: () => {
+        sectionIsVisible = true;
+        startAmbientMotion();
+      },
+      onLeave: pauseAmbientMotion,
+      onLeaveBack: pauseAmbientMotion
+    });
+
+    timeline.deploieCleanup = () => {
+      sectionIsVisible = false;
+      pauseAmbientMotion();
+      ambientHalo.kill();
+      ambientViewportTrigger.kill();
+      gsap.set(signals, { opacity: 0 });
+    };
 
     return timeline;
   };
@@ -779,6 +944,7 @@
       desktop: motionQueries.desktop,
       compact: motionQueries.mobileTablet,
       heroCompact: '(max-width: 900px)',
+      esigenzeCompact: motionQueries.esigenzeCompact,
       reducedMotion: motionQueries.reducedMotion
     }, (context) => {
       const heroOptions = {
@@ -786,7 +952,7 @@
         reducedMotion: context.conditions.reducedMotion
       };
       const esigenzeOptions = {
-        compact: context.conditions.compact,
+        compact: context.conditions.esigenzeCompact,
         reducedMotion: context.conditions.reducedMotion
       };
       const heroTimeline = createHeroTimeline(heroOptions);
@@ -798,6 +964,7 @@
       }
       if (esigenzeTimeline) {
         registerSectionTimeline('esigenze', esigenzeTimeline, () => {
+          esigenzeTimeline.deploieCleanup?.();
           setEsigenzeFinalState();
           document.querySelector('[data-es-system]')?.dispatchEvent(new CustomEvent('deploie:motion-complete'));
         });
